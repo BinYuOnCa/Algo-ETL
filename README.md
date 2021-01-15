@@ -19,25 +19,23 @@
 ## Mark 
 
 - Satisfactory (60%)
-   15-Data was loaded from finnhub to AWS RDS;
-   10-Job was scheduled and runs well;
-   10-Notification / Alert works as expected;
-   10-Applied basic best practice;
-   10-Clear project structure;
-    5-DB credential well managed;
-
+   - 15-Data was loaded from finnhub to AWS RDS;
+   - 10-Job was scheduled and runs well;
+   - 10-Notification / Alert works as expected;
+   - 10-Applied basic best practice;
+   - 10-Clear project structure;
+   -  5-DB credential well managed;
 - Above and beyond (40%) 
-   10-Exceptions handled properly;
-   10-Small jobs running parallel/dependently; 
-   10-Applied most best practices;
-    5-Multiple solutions for loading, eg, use API and lib;
-    5-Dual channels(Email, SMS) for notification/alert;
-
+   - 10-Exceptions handled properly;
+   - 10-Small jobs running parallel/dependently; 
+   - 10-Applied most best practices;
+   -  5-Multiple solutions for loading, eg, use API and lib;
+   -  5-Dual channels(Email, SMS) for notification/alert;
 - Nice to Have(20%)：
-    5-Configurable ETL behaviour;
-    5-Considered performance;
-    5-Unit test available;
-    5-All ETL jobs are idempotent;
+    - 5-Configurable ETL behaviour;
+    - 5-Considered performance;
+    - 5-Unit test available;
+    - 5-All ETL jobs are idempotent;
 
 
 
