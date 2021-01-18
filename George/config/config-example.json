@@ -7,6 +7,10 @@
         "db_engine":"postgresql",
         "compute":"EC2",
         "exchange":"US",
+        "update_company":"no",
+        "update_ticker_list":"no",
+        "api_limit":60,
+        "api_limit_time":60,
         "candle_freq":"1"
     },
     "mysql":{
@@ -34,6 +38,13 @@
         "sender":"sender email address",
         "sender_pwd":"sender email password",
         "receiver":"receiver email address"
+    },
+    "sms":{
+        "service":"twillio",
+        "SID":"your twillio SID",
+        "auth_token":"Your Twillio token",
+        "from_phone":"Your twillio phone numbeer",
+        "to_phone":"to_phone number"
     },
     "other":{
         "preprocessing_queue":[

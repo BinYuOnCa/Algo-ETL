@@ -27,6 +27,7 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
         month_step = 120 if candle_freq == "D" else 1
         last_timestamp = sql_func.get_last_timestamp(ticker, table_name, conn)
         if last_timestamp == None:
+            isfirstload = True
             last_close_price = None
             if candle_freq == 1:
                 start_timestamp = ctt.convert_datetime_timestamp(
@@ -35,6 +36,7 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
                 start_timestamp = ctt.convert_datetime_timestamp(
                 ctt.get_past_date(_date=datetime.today(), years=25))  # 25 years data
         else:
+            isfirstload = False
             start_timestamp = last_timestamp
             last_close_price = sql_func.get_symbol_close_price(ticker, table_name)
         stop_timestamp = ctt.convert_datetime_timestamp(datetime.today())
@@ -46,7 +48,11 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
             stock_candle = finn_func.get_candles_df(
                 ticker, candle_freq, month_list.timestamp_list[0], month_list.timestamp_list[1])
             if stock_candle is not None:
-                sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
+                if isfirstload:
+                    sql_func.insert_df_to_db(stock_candle, table_name)
+                    isfirstload = False
+                else:
+                    sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
                 if candle_freq == "D":
                     db_last_close_price = last_close_price.iloc[0, 0]
                     api_last_close_price = stock_candle.iloc[0, ]["close_price"]
