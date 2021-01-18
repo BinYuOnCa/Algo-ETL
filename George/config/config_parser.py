@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 
-path = str(Path(os.getcwd()))
+path = str(Path(__file__).parent)
 
 def read_from_config(file_name=path + "/config.json"):
     with open(file_name) as json_data_file:
