@@ -4,7 +4,7 @@
         "notice2":"change file name to config.json"
     },
     "settings":{
-        "db":"postgresql",
+        "db_engine":"postgresql",
         "compute":"EC2",
         "exchange":"US",
         "candle_freq":"1"
