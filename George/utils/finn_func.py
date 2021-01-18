@@ -32,8 +32,8 @@ def get_candles_df(ticker, candle_freq="D", start_timestamp=None,
         if stop_timestamp is None:
             stop_timestamp = ctt.convert_datetime_timestamp(datetime.today())
         finnhub_candles = finnhub_client.stock_candles(ticker, candle_freq, start_timestamp, stop_timestamp)
-        stock_candles = pd.DataFrame(finnhub_candles)
-        if stock_candles["s"].iloc[0] == "ok":
+        if finnhub_candles["s"] == "ok":
+            stock_candles = pd.DataFrame(finnhub_candles)
             stock_candles["symbol"] = str(ticker)
             stock_candles["date_int_key"] = \
                 stock_candles["t"].apply(ctt.convert_timestamp_datetime).apply(datetime.date)
