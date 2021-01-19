@@ -1,0 +1,14 @@
+# static config file
+
+db:
+  host: 192.168.1.19
+  user: postgres
+  db_name: algo
+log:
+  dir: log
+twilio:
+  from: '+16182128108'
+  to: '+19052087755'
+us_selected_symbols_file: Harry_sec_list_1000.csv
+
+
