@@ -41,7 +41,7 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
             start_timestamp = last_timestamp
             last_close_price = sql_func.get_symbol_close_price(ticker, table_name)
         stop_timestamp = ctt.convert_datetime_timestamp(datetime.today())
-        if start_timestamp + 86400 >= stop_timestamp and candle_freq == "D":
+        if (start_timestamp + 86400 < stop_timestamp and candle_freq == "D") or candle_freq == 1:
             month_list = ctt.date_by_month_list(
                 ctt.convert_timestamp_datetime(start_timestamp),
                 ctt.convert_timestamp_datetime(stop_timestamp))
@@ -57,18 +57,19 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
                     else:
                         sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
                     if candle_freq == "D":
-                        db_last_close_price = last_close_price.iloc[0, 0]
-                        api_last_close_price = stock_candle.iloc[0, ]["close_price"]
-                        issplit = False if api_last_close_price == db_last_close_price else True
-                        sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
-                        if issplit is True:
-                            timer.api_timer_handler()
-                            split_df = finn_func.get_split_df(
-                                ticker,
-                                ctt.convert_timestamp_datetime(month_list.timestamp_list[0]),
-                                ctt.convert_timestamp_datetime(month_list.timestamp_list[1]))
-                            if split_df is not None:
-                                sql_func.insert_df_to_db_iter(split_df)
+                        if last_close_price is not None:
+                            db_last_close_price = last_close_price.iloc[0, 0]
+                            api_last_close_price = stock_candle.iloc[0, ]["close_price"]
+                            issplit = False if api_last_close_price == db_last_close_price else True
+                            sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
+                            if issplit is True:
+                                timer.api_timer_handler()
+                                split_df = finn_func.get_split_df(
+                                    ticker,
+                                    ctt.convert_timestamp_datetime(month_list.timestamp_list[0]),
+                                    ctt.convert_timestamp_datetime(month_list.timestamp_list[1]))
+                                if split_df is not None:
+                                    sql_func.insert_df_to_db_iter(split_df)
                 else:
                     isempty = isempty and True
         if isempty is True:

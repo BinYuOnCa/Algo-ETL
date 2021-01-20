@@ -49,7 +49,7 @@ def insert_df_to_db_iter(df, table_name="split", _conn=conn):
             cursor.execute(
                 f"insert into {table_name} "
                 f"(ticker, split_date, from_factor, to_factor) values "
-                f"({row.symbol}, {row.date}, {row.fromFactor}, {row.toFactor})")
+                f"('{row.symbol}', '{parse(row.date).date()}', {row.fromFactor}, {row.toFactor})")
         _conn.commit()
     except Exception as e:
         with open(Path(__file__).parent / "../logs/finn_log.log", "a") as f:
