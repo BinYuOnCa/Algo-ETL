@@ -16,7 +16,7 @@ conn = db_conn.create_connection()
 
 def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
     """
-
+    main function to load candles.
     :param ticker:
     :param table_name:
     :param timer:
