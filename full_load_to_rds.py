@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from util.config import global_config
 from lib.db_wrap import truncate, get_engine
 import lib.finnhub_wrap as finnhub_wrap
+from lib.etl import get_selected_symbols_from_file
 
 table_name_finnhub_us_selected_day_candle = 'finnhub_us_selected_day_candle'
 table_name_finnhub_us_selected_1min_candle = 'finnhub_us_selected_1min_candle'
@@ -56,12 +57,6 @@ def _adjust_minute_candles_relative_to_20210101(minute_candles_df, splits_df):
     minute_candles_df['v'] *= minute_candles_df['split_factor']
 
 
-def get_symbols_from_file():
-    '''
-    Return iterable of symbols
-    '''
-    df = pd.read_csv(global_config['us_selected_symbols_file'], header=None, names=['symbol'])
-    return list(df['symbol'])
 
 
 def trunc_all_tables():
@@ -125,7 +120,7 @@ def full_reload_all_data(on_error=None):
     on_error - trigger to run on_error(e)
     '''
     trunc_all_tables()
-    symbols = get_symbols_from_file()
+    symbols = get_selected_symbols_from_file()
     for i, symbol in enumerate(symbols):
         print('>>>>', i, symbol)
         try:

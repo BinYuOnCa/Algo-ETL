@@ -1,24 +1,13 @@
+import pandas as pd
+
+from util.config import global_config
+import lib.db_wrap
+import lib.etl
+
+conn = lib.db_wrap.get_engine()
+
 # Get selected symbol list from csv file
+symbols_df = pd.read_csv(global_config['us_selected_symbols_file'], header=None, names=['symbol'])
 
-# update finnhub_us_selected_split (load, merge, save_diff)
-
-# get start_time and end_time of day candle for each symbol
-
-# get all new day candle data from finnhub
-
-# save to finnhub_us_selected_day_candle one time
-
-# calc split_factor and update price accordingly, and save to us_selected_day_candle (20210101 is the base of split)
-
-
-
-# get start_time and end_time of 1min candle for each symbol
-
-# get all new 1min candle data from finnhub
-
-# save to finnhub_us_selected_1min_candle one time
-
-# calc split_factor and update price accordingly, and save to us_selected_1min_candle (20210101 is the base of split)
-
-
-
+# load data
+symbols_df.apply(lambda row: lib.etl.load_day_candle(conn, row['symbol']), axis=1)

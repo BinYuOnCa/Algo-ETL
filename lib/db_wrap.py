@@ -46,3 +46,7 @@ def _connect_db():
     _metadata = MetaData(_engine, reflect=True)
     _base = declarative_base()
     return _engine
+
+def append_to_db(conn, df, table_name, if_cache=False):
+    if not if_cache:
+        df.to_sql(table_name, conn, if_exists='append', method='multi')

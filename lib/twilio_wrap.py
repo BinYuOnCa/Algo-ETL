@@ -2,11 +2,11 @@
 
 import requests
 
-import util.error as error
+import util.error
 from util.config import global_config
 import secrets
 
-
+@util.error.on_error(handler=util.error.get_error_handler(wait_time=1, re_run_times=1))
 def send_sms(msg):
     url = 'https://api.twilio.com/2010-04-01/Accounts/ACe164076dba47b1cfc8a02e16b780c42a/Messages.json'
     data = {'To': global_config['twilio']['to'], 'From': global_config['twilio']['from'], 'Body': msg}
@@ -15,7 +15,7 @@ def send_sms(msg):
         auth=(secrets.TWILIO_USER, secrets.TWILIO_PASS)
     )
     if response.status_code != 201:
-        raise error.LocalError(f'Fail to send sms {msg}. Response:{response.status_code}')
+        raise util.error.LocalError(f'Fail to send sms {msg}. Response:{response.status_code}')
 
 
 '''

@@ -6,6 +6,7 @@ db:
   db_name: algo
 log:
   dir: log
+  default_log_file: main.log
 twilio:
   from: '+16182128108'
   to: '+19052087755'

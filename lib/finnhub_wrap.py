@@ -24,7 +24,7 @@ def get_client():
 
 def get_stock_day_candles(symbol, start_date=None, end_date=None):
     '''
-    - Returns a DataFrame[symbol, t, o, h, l, c, v] sorted by 't' asc
+    - Returns a DataFrame[(symbol, t) o, h, l, c, v] sorted by 't' asc
     - Returns the data including both start_date and end_date
     - Both start_date and end_date should be datetime with only date, e.g. datetime.datetime(2020, 1, 1)
     - If the market is open, the candle data of today is removed because close price is not final.
@@ -57,6 +57,7 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
     df['symbol'] = symbol
     df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
     df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
+    df.set_index(['symbol', 't'], inplace=True)
     return df
 
 
