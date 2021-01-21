@@ -11,7 +11,7 @@ tox.ini
 secrets.py
 
 # Log files
-log/*
+*.log
 
 # Python related
 __pycache__/
