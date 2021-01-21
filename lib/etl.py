@@ -28,10 +28,10 @@ sql_stmt_last_day_candle = f'''
 sql_stmt_last_day_candle_staging = f'''
     WITH last_day_table AS (
         SELECT symbol, MAX(t) AS last_date
-        FROM {table_name_us_selected_day_candle}
+        FROM {table_name_us_selected_day_candle_finnhub}
         GROUP BY symbol
         )
-    SELECT symbol, t, o, h, l, c
+    SELECT all_day_table.symbol, t, o, h, l, c
     FROM {table_name_us_selected_day_candle_finnhub} AS all_day_table
     INNER JOIN last_day_table
     ON all_day_table.symbol = last_day_table.symbol and all_day_table.t = last_day_table.last_date
@@ -56,14 +56,14 @@ sql_stmt_last_min_candle_staging = f'''
         GROUP BY symbol
         )
     SELECT symbol, t, o, h, l, c
-    FROM {table_name_us_selected_1min_candle} AS all_min_table
+    FROM {table_name_us_selected_1min_candle_finnhub} AS all_min_table
     INNER JOIN last_min_table
     ON all_min_table.symbol = last_min_table.symbol and all_min_table.t = last_min_table.last_min
 '''
 
 sql_stmt_delete_day_candle = '''
-    DELTET FROM {}
-    WHERE symbol = {}
+    DELETE FROM {}
+    WHERE symbol = '{}'
 '''
 
 sql_stmt_get_split = '''

@@ -39,7 +39,7 @@ class ThreadFileHandler(logging.Handler):
 
     def _get_default_log_fp(self):
         if self.default_log_fp is None:
-            self.default_log_fp = open(os.path.join(self.dirname, self.default_log_file, "a"))
+            self.default_log_fp = open(os.path.join(self.dirname, self.default_log_file), "a")
         return self.default_log_fp
 
     def start_log(self, log_name, thread_name):
@@ -106,10 +106,8 @@ _logger.addHandler(_notification_handler)
 _logger.addHandler(_file_handler)
 
 def start_log(log_name, thread_name=None):
-
-    _file_handler.start_log()
     global _file_handler
-    _delete_handler(_file_handler)
+    _file_handler.start_log()
     log_path = get_log_file_name_with_timestamp(log_name)
     _file_handler = get_file_handler(logging.DEBUG, log_path)
     _logger.addHandler(_file_handler)
@@ -117,7 +115,4 @@ def start_log(log_name, thread_name=None):
 
 def stop_log():
     global _file_handler
-    _delete_handler(_file_handler)
-    _file_handler = _default_file_handler
     _logger.addHandler(_file_handler)
-    return
