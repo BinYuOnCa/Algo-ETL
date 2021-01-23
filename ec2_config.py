@@ -2,11 +2,10 @@
 # Author   : Yingwei Chen
 # Created  : 2021-1-17
 
-
 # AWS RDS connection parameters
 dbname='postgres'
 username='postgres'
-passwd='xing9139'
+passwd='*******'
 hostname='awspostgresql.cf4yfwopyfap.us-east-2.rds.amazonaws.com'
 portname='5432'
 param_dic={"host":hostname, "database": dbname, "user": username, "password":passwd }
@@ -28,5 +27,5 @@ twilio_to='+16479783581'
 db_connection_url=f"postgresql://{username}:{passwd}@{hostname}:{portname}/{dbname}"
 
 # for messaging
-gmail_password='Xing9139'
+gmail_password='*******'
 algotrading_email="algotradingyingweichen@gmail.com"
