@@ -12,9 +12,14 @@ conn = lib.db_wrap.get_engine()
 symbols_df = pd.read_csv(global_config['us_selected_symbols_file'], header=None, names=['symbol'])
 
 # load data
-def apply_func(row):
-    logging.info(f'>>>> {row["symbol"]}')
+def apply_func_day_candle(row):
+    logging.info(f'>>>>day>>>> {row["symbol"]}')
     lib.etl.load_day_candle(conn, row['symbol'])
 
+def apply_func_min_candle(row):
+    logging.info(f'>>>>min>>>> {row["symbol"]}')
+    lib.etl.load_1min_candle(conn, row['symbol'])
 
-symbols_df.apply(apply_func, axis=1)
+
+# symbols_df.apply(apply_func_day_candle, axis=1)
+symbols_df.apply(apply_func_min_candle, axis=1)

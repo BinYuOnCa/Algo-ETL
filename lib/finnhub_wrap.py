@@ -38,7 +38,7 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
     start_timestamp = int(start_date.timestamp()) - int(start_date.timestamp()) % 86400
     end_timestamp = int(end_date.timestamp()) - int(end_date.timestamp()) % 86400
 
-    stock_candle_all = {'c': [], 'h': [], 'l': [], 'o': [], 't': [], 'v': []}
+    stock_candle_df_list = []
     with finnhub.Client(api_key=finnhub_token) as fc:
         n = 5000
         while n >= 5000 and start_timestamp <= end_timestamp:
@@ -46,18 +46,20 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
             _check_stock_day_candle_data_format(res)
             n = len(res['t']) if res['s'] == 'ok' else 0
             if n > 0:
-                for k in stock_candle_all:
-                    stock_candle_all[k].extend(res[k])
+                stock_candle_df_list.append(pd.DataFrame({'c': res['c'], 'h': res['h'], 'l': res['l'], 'o': res['o'], 't': res['t'], 'v': res['v']}))
                 start_timestamp = res['t'][-1] - (res['t'][-1] % 86400) + 86400
 
-    df = pd.DataFrame(stock_candle_all)
-    df['t'] = df['t'] - (df['t'] % 86400)  # trunc datetime to full day
-    df['t'] = pd.to_datetime(df['t'], unit='s')
-    df.sort_values(by='t', inplace=True)
-    df['symbol'] = symbol
-    df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
-    df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
-    df.set_index(['symbol', 't'], inplace=True)
+    if stock_candle_df_list:
+        df = pd.concat(stock_candle_df_list)
+        df['t'] = pd.to_datetime(df['t'], unit='s')
+        df['t'] = df['t'].dt.floor('D')
+        df.sort_values(by='t', inplace=True)
+        df['symbol'] = symbol
+        df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
+        df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
+        df.set_index(['symbol', 't'], inplace=True)
+    else:
+        df = pd.DataFrame({'c': [], 'h': [], 'l': [], 'o': [], 't': [], 'v': []})
     return df
 
 
@@ -74,7 +76,7 @@ def get_stock_1min_candles(symbol, start_time=None, end_time=None):
     start_timestamp = int(start_time.timestamp())
     end_timestamp = int(end_time.timestamp())
 
-    stock_candle_all = {'c': [], 'h': [], 'l': [], 'o': [], 't': [], 'v': []}
+    stock_candle_df_list = []
     with finnhub.Client(api_key=finnhub_token) as fc:
         n = 5000
         while n > 0 and start_timestamp <= end_timestamp:
@@ -82,17 +84,20 @@ def get_stock_1min_candles(symbol, start_time=None, end_time=None):
             _check_stock_1min_candle_data_format(res)
             n = len(res['t']) if res['s'] == 'ok' else 0
             if n > 0:
-                for k in stock_candle_all:
-                    stock_candle_all[k].extend(res[k])
+                stock_candle_df_list.append(pd.DataFrame({'c': res['c'], 'h': res['h'], 'l': res['l'], 'o': res['o'], 't': res['t'], 'v': res['v']}))
                 end_timestamp = res['t'][0] - (res['t'][0] % 60) - 60
 
-    df = pd.DataFrame(stock_candle_all)
-    df['t'] = df['t'] - (df['t'] % 60)  # trunc datetime to minute
-    df['t'] = pd.to_datetime(df['t'], unit='s')
-    df.sort_values(by='t', inplace=True)
-    df['symbol'] = symbol
-    df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
-    df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
+    if stock_candle_df_list:
+        df = pd.concat(stock_candle_df_list)
+        df['t'] = pd.to_datetime(df['t'], unit='s')
+        df['t'] = df['t'].dt.floor('min')
+        df.sort_values(by='t', inplace=True)
+        df['symbol'] = symbol
+        df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
+        df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
+        df.set_index(['symbol', 't'], inplace=True)
+    else:
+        df = pd.DataFrame({'c': [], 'h': [], 'l': [], 'o': [], 't': [], 'v': []})
     return df
 
 

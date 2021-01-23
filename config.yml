@@ -7,6 +7,7 @@ db:
 log:
   dir: log
   default_log_file: main.log
+  log_leve: info  # TODO
 twilio:
   from: '+16182128108'
   to: '+19052087755'

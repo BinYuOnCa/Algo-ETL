@@ -9,6 +9,11 @@ import lib.twilio_wrap
 import util.error
 
 log_dir = os.path.abspath(global_config['log']['dir'])
+if not os.path.isdir(log_dir):
+    try:
+        os.mkdir(log_dir)
+    except OSError:
+        print(f"Failed to create logging dir {log_dir}.")
 default_log_file_name = global_config['log']['default_log_file']
 
 class NotifyHandler(logging.StreamHandler):

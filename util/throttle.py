@@ -4,6 +4,7 @@ import time
 # This convenience func preserves name and docstring
 from functools import wraps
 
+MINIMUM_WAIT_TIME = 0.2  # 0.2s
 
 def throttle(period, max_times, on_throttle=None):
     '''
@@ -21,7 +22,7 @@ def throttle(period, max_times, on_throttle=None):
             while not run_q.empty and run_q.queue[0] < now - period:
                 run_q.get()
             if run_q.full():
-                sleep_time = period - (now - run_q.queue[0])
+                sleep_time = max(period - (now - run_q.queue[0]), MINIMUM_WAIT_TIME)
                 if sleep_time > 0:
                     if on_throttle:
                         on_throttle(sleep_time, run_q)
