@@ -1,4 +1,4 @@
-from .config import cred_info, msg_info
+from .config import cred_info, msg_info, log
 import smtplib
 from twilio.rest import Client
 
@@ -13,11 +13,16 @@ def send_email(subject, msg):
     server = smtplib.SMTP('smtp.gmail.com:587')
     server.ehlo()
     server.starttls()
-    server.login(cred_info['email_addr'], cred_info['email_code'])
-    server.sendmail(from_addr=cred_info['email_addr'],
-                    to_addrs=cred_info['email_addr'],
-                    msg='Subject: ' + msg_info['tmp'].format(subject, msg))
-    server.quit()
+
+    try:
+        server.login(cred_info['email_addr'], cred_info['email_code'])
+        server.sendmail(from_addr=cred_info['email_addr'],
+                        to_addrs=cred_info['email_addr'],
+                        msg='Subject: ' + msg_info['tmp'].format(subject, msg))
+        server.quit()
+    except Exception as e:
+        log.error('Cannot Log in the email, the message is\n {} - {}'.format(
+            msg, e))
 
 
 def send_sms(subject, msg):
@@ -27,11 +32,20 @@ def send_sms(subject, msg):
     :param msg: (Str)
     :return: 
     '''
-    client = Client(cred_info['sid'], cred_info['token'])
-    client.messages.create(body='------------------' +
-                           msg_info['tmp'].format(subject, msg),
-                           from_=cred_info['free_tel'],
-                           to=cred_info['personal_tel'])
+    try:
+        client = Client(cred_info['sid'], cred_info['token'])
+    except Exception as e:
+        log.warning(
+            'Error in account sid or token, the message is\n {} - {}'.format(
+                msg, e))
+    try:
+        client.messages.create(body='------------------' +
+                               msg_info['tmp'].format(subject, msg),
+                               from_=cred_info['free_tel'],
+                               to=cred_info['personal_tel'])
+    except Exception as e:
+        log.warning('Error in phone number, the message is\n {} - {}'.format(
+            msg, e))
 
 
 def notification(subject, msg, sms=True, email=True):

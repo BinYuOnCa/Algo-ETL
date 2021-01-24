@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from .config import column_names, tab_names, temp_csv
+from .config import column_names, tab_names, temp_csv, log
 
 
 class Database(object):

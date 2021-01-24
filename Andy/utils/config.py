@@ -1,4 +1,5 @@
 import os
+import logging as log
 
 # credential information
 cred_info = {
@@ -59,3 +60,7 @@ msg_info = {
     ''',
     'fail': 'Failed to download {} symbols below:\n{}'
 }
+
+# logging
+log.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
+                filename='./log')
