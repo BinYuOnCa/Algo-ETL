@@ -1,0 +1,9 @@
+AWS EC2: ec2-35-182-154-31.ca-central-1.compute.amazonaws.com
+
+RDS: db4algo.cezrrappgcla.ca-central-1.rds.amazonaws.com
+user: postgresql
+password: password
+
+jyputer notebook: ec2-35-182-154-31.ca-central-1.compute.amazonaws.com:8888
+password: 1234
+
