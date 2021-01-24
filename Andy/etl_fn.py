@@ -135,6 +135,6 @@ if __name__ == '__main__':
     #end = datetime(2021, 1, 21)
     #ETL('1d', end_date=end, start_date=start)
     #First 1m ETL
-    start = datetime(2020, 1, 25)
-    end = datetime(2021, 1, 21)
-    ETL('1m', end_date=end, start_date=start)
+    #start = datetime(2020, 1, 25)
+    #end = datetime(2021, 1, 21)
+    #ETL('1m', end_date=end, start_date=start)
