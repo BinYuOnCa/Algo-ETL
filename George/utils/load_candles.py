@@ -1,6 +1,7 @@
 from datetime import datetime
 import pandas as pd
 from pathlib import Path
+import time
 
 import config.config_parser as conf
 import utils.api_timer as api_timer
@@ -14,7 +15,7 @@ import utils.sql_func as sql_func
 db_conn = db_func.DB_Conn()
 conn = db_conn.create_connection()
 
-def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
+def load_candles(ticker, table_name, candle_freq, timer, last_timestamp, _conn=conn):
     """
     main function to load candles.
     :param ticker:
@@ -26,10 +27,10 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
     try:
         isempty = 1
         month_step = 120 if candle_freq == "D" else 1
-        last_timestamp = sql_func.get_last_timestamp(ticker, table_name, conn)
+        last_close_price = None
+        # last_timestamp = sql_func.get_last_timestamp(ticker, table_name, conn)
         if last_timestamp == None:
             isfirstload = True
-            last_close_price = None
             if candle_freq == 1:
                 start_timestamp = ctt.convert_datetime_timestamp(
                 ctt.get_past_date(_date=datetime.today(), years=1))  # 1 years data
@@ -39,14 +40,17 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
         else:
             isfirstload = False
             start_timestamp = last_timestamp
-            last_close_price = sql_func.get_symbol_close_price(ticker, table_name)
-        stop_timestamp = ctt.convert_datetime_timestamp(datetime.today())
+        if candle_freq == 1:
+            stop_timestamp = ctt.convert_datetime_timestamp(datetime.today()) - 84600
+        else:
+            stop_timestamp = ctt.convert_datetime_timestamp(datetime.today())
+
         if (start_timestamp + 86400 < stop_timestamp and candle_freq == "D") or candle_freq == 1:
             month_list = ctt.date_by_month_list(
                 ctt.convert_timestamp_datetime(start_timestamp),
                 ctt.convert_timestamp_datetime(stop_timestamp))
             while month_list.next_timestamp_list(month=month_step) is not None:
-                timer.api_timer_handler()
+                timer.api_timer_handler() # Not work as intended, but left in for further dev
                 stock_candle = finn_func.get_candles_df(
                     ticker, candle_freq, month_list.timestamp_list[0], month_list.timestamp_list[1])
                 if stock_candle is not None:
@@ -56,6 +60,7 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
                         isfirstload = False
                     else:
                         sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
+                        last_close_price = sql_func.get_symbol_close_price(ticker, table_name)
                     if candle_freq == "D":
                         if last_close_price is not None:
                             db_last_close_price = last_close_price.iloc[0, 0]
@@ -63,7 +68,7 @@ def load_candles(ticker, table_name, candle_freq, timer, _conn=conn):
                             issplit = False if api_last_close_price == db_last_close_price else True
                             sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
                             if issplit is True:
-                                timer.api_timer_handler()
+                                timer.api_timer_handler()  # Not work as intended, but left in for further dev
                                 split_df = finn_func.get_split_df(
                                     ticker,
                                     ctt.convert_timestamp_datetime(month_list.timestamp_list[0]),
