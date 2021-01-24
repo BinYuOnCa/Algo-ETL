@@ -1,5 +1,5 @@
 [FinnhubKey]
-APIKey=c05raev48v6uiu31gefg
+APIKey=
 
 [PG_TABLE_NAME]
 DailyCandle=us_equity_daily_finn

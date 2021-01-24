@@ -21,7 +21,7 @@ def us_equity_candles_ETL_run(interval):
 
         # Setup client
 
-        finch_client = finnhub.Client(api_key="c05raev48v6uiu31gefg")
+        finch_client = finnhub.Client(api_key=API_KEI)
 
         # Stock candles data from Internet
         if interval == '1m':

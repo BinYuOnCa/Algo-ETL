@@ -17,8 +17,8 @@ from twilio.rest import Client
 
 # send sms
 def send_sms(msg):
-    account_sid = "AC7857d738ad4ffbdecbc7f774c7218091"
-    auth_token = "d8d703f5d7bae461c4a3c1c35920cba4"
+    account_sid = "Ac7218091"
+    auth_token = "d920cba4"
 
     client = Client(account_sid, auth_token)
 
