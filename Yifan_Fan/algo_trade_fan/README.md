@@ -132,20 +132,32 @@ After recording the detection, the process will then extract the gap period spli
 > All the customized configurations can be modified in `./etl_utils/etl_config.py`
 
 - FINNHUB_CONFIG["API_LIMIT"]
-The [finnhub.io](http://finnhub.io) API has an limit request time as 60/min to avoid exceeding the limit. The API revisit time interval can be set. Default interval is 1.25 seconds.
-This setting is also available when working in multiple threads processes.
+
+  The [finnhub.io](http://finnhub.io) API has an limit request time as 60/min to avoid exceeding the limit. The API revisit time interval can be set. Default interval is 1.25 seconds.
+  This setting is also available when working in multiple threads processes.
+
 - FINNHUB_CONFIG["INTRADAY_LIMIT"]
-Because the API will only return the minute-level data for 30 days interval, longer period will be divided into several shorter time series. This setting will set the length of time interval. Default is 30 days.
+
+  Because the API will only return the minute-level data for 30 days interval, longer period will be divided into several shorter time series. This setting will set the length of time interval. Default is 30 days.
+
 - USER_CUSTOM["POSTPONE"]
-In order to keep data consistency and avoid data jumping, users can set a postponed time interval to download data in the past. 
-For example, the default setting is 24 hours, which means the data will be updated up to yesterday (24 hours ago) if the process executes now.
+
+  In order to keep data consistency and avoid data jumping, users can set a postponed time interval to download data in the past. 
+  For example, the default setting is 24 hours, which means the data will be updated up to yesterday (24 hours ago) if the process executes now.
+
 - USER_CUSTOM["ALERT"]
-- If the process is successfully executed, send an email to assigned receiver;
-- If the process exits with any exceptions, message the error information immediately to assigned phone number.
-Default is True.
+
+  - If the process is successfully executed, send an email to assigned receiver;
+
+  - If the process exits with any exceptions, message the error information immediately to assigned phone number.
+
+    Default is True.
+
 - USER_CUSTOM["MULTILINE"]
-Run the "daily-level" and "minute-level" data ETL process in parallel.
-Won't exceed the API request limit.
-Default is True.
+
+  Run the "daily-level" and "minute-level" data ETL process in parallel.
+  Won't exceed the API request limit. Default is True.
+
 - `./auto_mission.sh`
-Set to your own directory, and then use `Crontab` to schedule the mission.
+
+  Set to your own directory, and then use `Crontab` to schedule the mission.
