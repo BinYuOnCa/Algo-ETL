@@ -1,0 +1,4 @@
+DB_NAME=algotrading
+DB_USERNAME=postgres
+DB_PWD=1987612ren-
+DB_HOST=algotrading.csfjwwgwtmkm.ca-central-1.rds.amazonaws.com
