@@ -161,3 +161,9 @@ After recording the detection, the process will then extract the gap period spli
 - `./auto_mission.sh`
 
   Set to your own directory, and then use `Crontab` to schedule the mission.
+  
+- crontab setting reference
+
+  ```
+  0 5 * * * . /etc/profile;/bin/sh /home/ubuntu/workshop/algo_trade_fan/auto_mission.sh
+  ```
