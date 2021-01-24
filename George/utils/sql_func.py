@@ -59,7 +59,7 @@ def insert_df_to_db_iter(df, table_name="split", _conn=conn):
 def get_symbol_close_price(symbol, table_name, date=None, _conn=conn):
     if date is None:
         date = get_symbol_max_date(symbol, table_name)
-    close_price = pd.read_sql(f"select avg(close_price) as close_price from {table_name} "
+    close_price = pd.read_sql(f"select max(close_price) as close_price from {table_name} "
                        f"where symbol = '{symbol}' and date_int_key = '{date}'", _conn)
     return close_price if len(close_price) != 0 else None
 

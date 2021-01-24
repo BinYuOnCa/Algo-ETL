@@ -60,7 +60,8 @@ def load_candles(ticker, table_name, candle_freq, timer, last_timestamp, _conn=c
                         isfirstload = False
                     else:
                         sql_func.insert_df_to_db(stock_candle.drop(stock_candle.index[0]), table_name)
-                        last_close_price = sql_func.get_symbol_close_price(ticker, table_name)
+                        if candle_freq != 1:
+                            last_close_price = sql_func.get_symbol_close_price(ticker, table_name)
                     if candle_freq == "D":
                         if last_close_price is not None:
                             db_last_close_price = last_close_price.iloc[0, 0]
