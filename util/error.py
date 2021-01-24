@@ -67,18 +67,8 @@ def error_handler_raise(e, re_run):
 
 def get_error_handler(wait_time=0, re_run_times=0, exceptions_handled=None, raise_if_same_errors: int = 1):
     '''
-    Generate error_handle function for on_error decorator
+    Create a error handler
 
-    Args:
-        wait_time (int, optional): wait in second. Defaults to 0.
-        re_run_times (int, optional): Defaults to 0.
-        exceptions_handled (Union(Exception, [Excption]), optional): Defaults to None.
-
-    Raises:
-        e: [description]
-
-    Returns:
-        [type]: [description]
     '''
     if not exceptions_handled:
         exceptions_tuple = (Exception,)

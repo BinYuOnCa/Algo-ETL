@@ -14,6 +14,10 @@ conn = lib.db_wrap.get_connection()
 # Get selected symbol list from csv file
 symbols_df = pd.read_csv(global_config['etl']['symbols_file'], header=None, names=['symbol'])
 symbols_df = symbols_df.sample(frac=1)
+symbols_df['result_day'] = 'pending'
+symbols_df['result_day_err_msg'] = ''
+symbols_df['result_min'] = 'pending'
+symbols_df['result_min_err_msg'] = ''
 
 lib.etl.trunc_all_tables()
 
@@ -21,17 +25,42 @@ lib.etl.trunc_all_tables()
 @util.error.on_error(util.error.get_error_handler(wait_time=30, raise_if_same_errors=10))
 def apply_func_day_candle(row):
     logging.info(f'>>>>day>>>> {row["symbol"]}')
-    lib.etl.load_full_day_candle_from_finnhub(conn, row['symbol'], delete_before_load=False)
+    try:
+        lib.etl.load_full_day_candle_from_finnhub(conn, row['symbol'], delete_before_load=False)
+    except Exception as e:
+        row['result_day'] = 'error'
+        row['result_day_err_msg'] = f'error:{e}'
+        raise e
+    else:
+        row['result_day'] = 'ok'
 
 
 @util.error.on_error(util.error.get_error_handler(wait_time=30, raise_if_same_errors=10))
 def apply_func_min_candle(row):
     logging.info(f'>>>>min>>>> {row["symbol"]}')
-    lib.etl.load_full_min_candle_from_finnhub(conn, row['symbol'], delete_before_load=False)
+    try:
+        lib.etl.load_full_min_candle_from_finnhub(conn, row['symbol'], delete_before_load=False)
+    except Exception as e:
+        row['result_min'] = 'error'
+        row['result_min_err_msg'] = f'error:{e}'
+        raise e
+    else:
+        row['result_min'] = 'ok'
 
 
-symbols_df.apply(apply_func_day_candle, axis=1)
-symbols_df.apply(apply_func_min_candle, axis=1)
+try:
+    symbols_df.apply(apply_func_day_candle, axis=1)
+    symbols_df.apply(apply_func_min_candle, axis=1)
+except Exception as e:
+    n_total = len(symbols_df)
+    stat_day = symbols_df['result_day'].value_counts()
+    stat_min = symbols_df['result_min'].value_counts()
+    logging.critical(f"Full load failed! day({stat_day['error']}error, {stat_day['pending']}pending, {n_total}total), min({stat_min['error']}error, {stat_min['pending']}pending, {n_total}total)")
+    logging.exception(e)
+    raise e
+else:
+    lib.twilio_wrap.send_sms('Full load is ok')
+
 
 # def _adjust_day_candles_relative_to_20210101(day_candles_df, splits_df):
 #     '''

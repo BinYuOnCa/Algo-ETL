@@ -1,6 +1,7 @@
 import datetime
 import pandas as pd
 import time
+import logging
 
 import finnhub
 from util.throttle import throttle
@@ -11,7 +12,7 @@ finnhub.Client.DEFAULT_TIMEOUT = 20
 
 # throttle finnhub request speed
 finnhub.Client._request = throttle(period=60, max_times=58,
-                                   on_throttle=lambda t, _: print(f'throttle {t:.2f}s'))(finnhub.Client._request)
+                                   on_throttle=lambda t, _: logging.debug(f'throttle {t:.2f}s'))(finnhub.Client._request)
 
 class FinnhubDataFormatError(Exception):
     '''
@@ -62,7 +63,7 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
         df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
         df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
         df.set_index(['symbol', 't'], inplace=True)
-    else: 
+    else:
         df = pd.DataFrame({'c': [], 'h': [], 'l': [], 'o': [], 't': [], 'v': []})
     return df
 

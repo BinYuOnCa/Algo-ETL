@@ -153,11 +153,12 @@ def load_new_day_candle_from_finnhub(conn, symbol):
     last_day_candle_staging = get_last_day_candle(symbol, from_staging=True)
     if last_day_candle_staging is None or last_day_candle_staging.empty:
         load_full_day_candle_from_finnhub(conn, symbol, delete_before_load=False)
-    last_open_staging, last_date_staging = last_day_candle_staging['open'], last_day_candle_staging['date']
+    last_date_staging = last_day_candle_staging['date']
     new_candles = finn.get_stock_day_candles(symbol, start_date=last_date_staging, end_date=pd.Timestamp.now(time.tzname[0]).floor('D'))
 
     # Check if there is a split, compared with last day
     # f_split = 1
+    # last_open_staging = last_day_candle_staging['open']
     # if (symbol, last_date_staging) not in new_candles.index:
     #     raise util.error.RemoteHostError(f'Fail to find last day candle from finnhub. Last_date is {last_date_staging}')
     # last_open_new = new_candles.loc[(symbol, last_date_staging), 'open']
