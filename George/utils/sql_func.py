@@ -22,9 +22,9 @@ def get_ticker_to_update_df(_conn=conn, col_name="ticker",
     return pd.read_sql(f"select {col_name} from {table_name} "
                        f"where create_date = (select max(create_date) from {table_name})", _conn)
 
-def get_last_timestamp(symbol, table_name, _conn=conn):
-    return pd.read_sql(f"select max(finn_timestamp) from {table_name} "
-                           f"where symbol = '" + str(symbol) + "'" , _conn).iloc[0, 0]
+def get_last_timestamp_df(table_name, _conn=conn):
+    return pd.read_sql(f"select symbol, max(finn_timestamp) as finn_timestamp from {table_name} "
+                           f"group by symbol" , _conn)
 
 def insert_df_to_db(df, table_name,sqlalchemy_engine=sqlalchemy_engine,
                     sqlserver_engine=conf.settings()["db_engine"]):
