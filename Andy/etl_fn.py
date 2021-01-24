@@ -1,11 +1,10 @@
-import os
 import pandas as pd
 from datetime import datetime
 from utils.extract import download_candle
 from utils.transform import candles_df_to_csv
 from utils.db import Database
 from utils.memory import memory_using
-from utils.config import cred_info, failed_csv, temp_csv, tab_names, msg_info
+from utils.config import cred_info, failed_csv, temp_csv, tab_names, msg_info, log
 from utils.alert import notification
 from utils.time_processor import (export_recent_dates, get_rencent_dates,
                                   convert_from_sec, add_days)
@@ -65,20 +64,17 @@ def ETL(interval,
                                              recent_dates=recent_dates)
             clean_candles_df = clean_candles_df.append(raw_candles_df,
                                                        ignore_index=True)
-            print(symbol)
 
         except Exception as e:
             # 若发生下载问题，跳过此symbol，记载failed的symbol
-            print('error: {}'.format(e))
+            log.warning('Failed to download {} - {}'.format(symbol, e))
             failed_symbol.append(symbol + '\n')
-            print('Failed to download ' + symbol)
         curr_memory = memory_using()
         # Transfer when memory usage is too high or all extraction are done
         if curr_memory > memory_limit or symbol == symbols[-1]:
             n_records += len(clean_candles_df)  # update the number of records
             transfer(clean_candles_df, interval, conn_str)
             clean_candles_df = pd.DataFrame()
-            print(clean_candles_df)
 
     if failed_symbol:
         with open(failed_csv[interval], 'w') as failed:

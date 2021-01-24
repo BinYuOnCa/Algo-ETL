@@ -3,8 +3,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 import time
 import os
-from .config import column_names, intraday_limit, resolution, cred_info
+from .config import column_names, intraday_limit, resolution, cred_info, log
 from .time_processor import timeframe_gen, add_days
+
 
 def download_candle(symbol,
                     interval,
@@ -26,8 +27,11 @@ def download_candle(symbol,
     finnhub_client = finnhub.Client(api_key=api_key)
     # Set the generator to give timeframe in unix time
     if start_date is None:
-        start_date = add_days(recent_dates[symbol][0], 1)
-        print(start_date)
+        try:
+            start_date = add_days(recent_dates[symbol][0], 1)
+        except KeyError as e:
+            log.error('Cannot find recent date for {} - {}'.format(symbol, e))
+
     increment = intraday_limit if interval == '1m' else None
     timeframe_generator = timeframe_gen(start=start_date,
                                         end=end_date,
@@ -46,10 +50,10 @@ def download_candle(symbol,
         # add symbol key if the candles exist
         if len(raw_candles):
             raw_candles['symbol'] = symbol
-            candles_df = candles_df.append(pd.DataFrame(raw_candles), ignore_index=True)
+            candles_df = candles_df.append(pd.DataFrame(raw_candles),
+                                           ignore_index=True)
         elapse = time.time() - timer
         # Sleep until 1s is passed
         time.sleep(max(1 - elapse, 0))
 
     return candles_df
-
