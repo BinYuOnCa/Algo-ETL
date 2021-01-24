@@ -14,7 +14,6 @@ def connect_to_finnhub():
     try:
         finnhub_client = finnhub.Client(
             api_key=FINNHUB_CONFIG["FINNHUB_API"])
-        print(finnhub_client)
         return finnhub_client
     except Exception:
         error_sms()
@@ -23,14 +22,11 @@ def connect_to_finnhub():
 def download_1m_finn(stock,start_day,end_day):
     res = connect_to_finnhub().stock_candles(
         stock, '1', start_day, end_day )
+    #print(res)
     return res
-    # stock_candles = pd.DataFrame.from_records(res)
-    # print(stock_candles)
-
-# download_1m_finn('BILI',1611211378,1611340978)
 
 def download_daily_finn(stock,start_day,end_day):
     res = connect_to_finnhub().stock_candles(
         stock, 'D', start_day, end_day )
-    print(res)
+    #print(res)
     return res
