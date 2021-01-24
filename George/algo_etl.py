@@ -38,9 +38,10 @@ def algo_etl_main_control(candle_freq_list=["D"]):
             for index, row in ticker_to_update.iterrows():
                 ticker = row.ticker
                 last_timestamp = helper.get_last_timestamp(ticker, current_last_timestamps_df)
-                print("processing: ", candle_freq, "at: ", datetime.now(), index + 1, "/", ticker_count)
                 execution_result = load_candles.load_candles(
                     row.ticker, table_name, candle_freq, timer, last_timestamp, conn)
+                print("processed: ", candle_freq, "at: ", datetime.now(),
+                      index + 1, "/", ticker_count, "result: ", execution_result)
                 if execution_result == "Success":
                     ticker_success += 1
                 elif execution_result == "no data":
