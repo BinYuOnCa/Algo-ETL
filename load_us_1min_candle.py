@@ -12,15 +12,15 @@ def load_and_save(symbol):
         if df.empty:
             print('>>>', symbol, 'no_data')
             return
-        df.to_sql('finnhub_us_1min_candle', lib.db_wrap.get_engine(), if_exists='append', index=False)
+        df.to_sql('finnhub_us_1min_candle', lib.db_wrap.get_connection(), if_exists='append', index=False)
     except Exception as e:
         print('>>>', symbol, f'error:{e}')
         return
     print('>>>', symbol, f'{len(df)}')
 
 
-us_symbols = pd.read_sql('select symbol from finnhub_us_symbols', lib.db_wrap.get_engine())
-us_symbols_saved = pd.read_sql('select distinct symbol from finnhub_us_1min_candle', lib.db_wrap.get_engine())
+us_symbols = pd.read_sql('select symbol from finnhub_us_symbols', lib.db_wrap.get_connection())
+us_symbols_saved = pd.read_sql('select distinct symbol from finnhub_us_1min_candle', lib.db_wrap.get_connection())
 symbols = set(us_symbols['symbol'])-set(us_symbols_saved['symbol'])
 print(f'total {len(symbols)} symbols need to be download')
 for s in symbols:

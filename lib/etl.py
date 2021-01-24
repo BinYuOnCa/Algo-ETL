@@ -1,5 +1,5 @@
 import pandas as pd
-import datetime as dt
+import time
 import logging
 
 import lib.finnhub_wrap as finn
@@ -93,10 +93,10 @@ def get_last_day_candle(symbol=None, from_staging=False):
     global _all_symbols_last_day_candle_staging
 
     if from_staging and _all_symbols_last_day_candle_staging is None:
-        _all_symbols_last_day_candle_staging = get_last_day_candle_from_db(conn=lib.db_wrap.get_engine(), from_staging=True)
+        _all_symbols_last_day_candle_staging = get_last_day_candle_from_db(conn=lib.db_wrap.get_connection(), from_staging=True)
 
     if not from_staging and _all_symbols_last_day_candle is None:
-        _all_symbols_last_day_candle = get_last_day_candle_from_db(conn=lib.db_wrap.get_engine(), from_staging=False)
+        _all_symbols_last_day_candle = get_last_day_candle_from_db(conn=lib.db_wrap.get_connection(), from_staging=False)
 
     global_cache = _all_symbols_last_day_candle_staging if from_staging else _all_symbols_last_day_candle
 
@@ -121,17 +121,17 @@ def get_last_min_candle(symbol=None, from_staging=False):
     global _all_symbols_last_min_candle_staging
 
     if from_staging and _all_symbols_last_min_candle_staging is None:
-        _all_symbols_last_min_candle_staging = get_last_min_candle_from_db(conn=lib.db_wrap.get_engine(), from_staging=True)
+        _all_symbols_last_min_candle_staging = get_last_min_candle_from_db(conn=lib.db_wrap.get_connection(), from_staging=True)
 
     if not from_staging and _all_symbols_last_min_candle is None:
-        _all_symbols_last_min_candle = get_last_min_candle_from_db(conn=lib.db_wrap.get_engine(), from_staging=False)
+        _all_symbols_last_min_candle = get_last_min_candle_from_db(conn=lib.db_wrap.get_connection(), from_staging=False)
 
     global_cache = _all_symbols_last_min_candle_staging if from_staging else _all_symbols_last_min_candle
 
     if symbol is None:
         return global_cache
     else:
-        return global_cache.get(symbol, None)  # return None if symbol is not found
+        return global_cache.loc[symbol] if symbol in global_cache.index else None
 
 def delete_day_candle_in_db(conn, symbol, staging=False):
     table_name = table_name_us_selected_day_candle_finnhub if staging else table_name_us_selected_day_candle
@@ -151,17 +151,19 @@ def load_full_day_candle_from_finnhub(conn, symbol, delete_before_load=True):
 def load_new_day_candle_from_finnhub(conn, symbol):
     # Retrive new day candle data from finnhub, include the lastest day in db in order to check split.
     last_day_candle_staging = get_last_day_candle(symbol, from_staging=True)
+    if last_day_candle_staging is None or last_day_candle_staging.empty:
+        load_full_day_candle_from_finnhub(conn, symbol, delete_before_load=False)
     last_open_staging, last_date_staging = last_day_candle_staging['open'], last_day_candle_staging['date']
-    new_candles = finn.get_stock_day_candles(symbol, start_date=last_date_staging, end_date=dt.datetime.today())
+    new_candles = finn.get_stock_day_candles(symbol, start_date=last_date_staging, end_date=pd.Timestamp.now(time.tzname[0]).floor('D'))
 
     # Check if there is a split, compared with last day
-    f_split = 1
-    if (symbol, last_date_staging) not in new_candles.index:
-        raise util.error.RemoteHostError(f'Fail to find last day candle from finnhub. Last_date is {last_date_staging}')
-    last_open_new = new_candles.loc[(symbol, last_date_staging), 'open']
-    if last_open_new != last_open_staging:
-        f_split = last_open_staging / last_open_new
-    new_candles.drop((symbol, last_date_staging), error='ignore', inplace=True)
+    # f_split = 1
+    # if (symbol, last_date_staging) not in new_candles.index:
+    #     raise util.error.RemoteHostError(f'Fail to find last day candle from finnhub. Last_date is {last_date_staging}')
+    # last_open_new = new_candles.loc[(symbol, last_date_staging), 'open']
+    # if last_open_new != last_open_staging:
+    #     f_split = last_open_staging / last_open_new
+    # new_candles.drop((symbol, last_date_staging), error='ignore', inplace=True)
 
     # Save new data to staging db
     lib.db_wrap.append_to_db(conn=conn, df=new_candles, table_name=table_name_us_selected_day_candle_finnhub)
@@ -188,8 +190,10 @@ def load_full_min_candle_from_finnhub(conn, symbol, delete_before_load=True):
 
 def load_new_min_candle_from_finnhub(conn, symbol):
     last_min_candle_staging = get_last_min_candle(symbol, from_staging=True)
-    last_min_staging = last_min_candle_staging['t'] + pd.Timedelta('1min') if last_min_candle_staging is None or last_min_candle_staging.empty else None
-    new_candles = finn.get_stock_min_candles(symbol, start_time=last_min_staging, end_time=dt.datetime.today().floor('min'))
+
+    start_time = last_min_candle_staging['t'] + pd.Timedelta('1min') if not(last_min_candle_staging is None or last_min_candle_staging.empty) else None
+    end_time = pd.Timestamp.now(time.tzname[0]).floor('min')
+    new_candles = finn.get_stock_1min_candles(symbol, start_time=start_time, end_time=end_time)
     # Save new data to staging db
     lib.db_wrap.append_to_db(conn=conn, df=new_candles, table_name=table_name_us_selected_1min_candle_finnhub, method='copy_from_memory')
 
@@ -203,3 +207,11 @@ def load_1min_candle(conn, symbol):
         load_full_min_candle_from_finnhub(conn, symbol)
     else:
         load_new_min_candle_from_finnhub(conn, symbol)
+
+
+def trunc_all_tables():
+    lib.db_wrap.truncate(table_name_us_selected_day_candle_finnhub)
+    lib.db_wrap.truncate(table_name_us_selected_1min_candle_finnhub)
+    # lib.db_wrap.truncate(table_name_us_selected_day_candle)
+    # lib.db_wrap.truncate(table_name_us_selected_1min_candle)
+    # lib.db_wrap.truncate(table_name_us_selected_split_finnhub)

@@ -6,13 +6,14 @@ from functools import wraps
 
 MINIMUM_WAIT_TIME = 0.2  # 0.2s
 
-def throttle(period, max_times, on_throttle=None):
+def throttle(period, max_times, on_throttle=None, max_queue_size=100):
     '''
     If the calling of function is too frequent, it will sleep for a while
     period - seconds of a monitoring period
     max_times - maximum times that it can run
     on_throttle - params is (sleep_time, run_queue). sleep_time is in second
     '''
+    # TODO using sampling if max_times is bigger than max_queue_size
     def decorator(func):
         run_q = Queue(maxsize=max_times)
 

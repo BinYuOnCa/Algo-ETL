@@ -9,6 +9,7 @@ import lib.twilio_wrap
 import util.error
 
 log_dir = os.path.abspath(global_config['log']['dir'])
+tzname = global_config['log']['tzname']
 if not os.path.isdir(log_dir):
     try:
         os.mkdir(log_dir)
@@ -49,7 +50,7 @@ class ThreadFileHandler(logging.Handler):
 
     def start_log(self, log_name, thread_name):
         if thread_name not in self.files:
-            fp = open(os.path.join(f"{util.misc.get_now_datetime()}-{thread_name}-{log_name}.log"))
+            fp = open(os.path.join(f"{util.misc.get_now_datetime(tzname)}-{thread_name}-{log_name}.log"))
             self.files[thread_name] = fp
 
     def stop_log(self, thread_name):
@@ -82,7 +83,7 @@ def get_console_handler(level):
 def get_log_file_name_with_timestamp(log_name):
     if not os.path.isdir(log_dir):
         raise ValueError(f'Can not find log dir {log_dir}')
-    log_filename = util.misc.get_now_datetime()+'_'+log_name
+    log_filename = util.misc.get_now_datetime(tzname)+'_'+log_name
     return log_dir + os.sep + log_filename
 
 def get_file_handler(level, log_dir, defaul_log_file):
@@ -121,3 +122,54 @@ def start_log(log_name, thread_name=None):
 def stop_log():
     global _file_handler
     _logger.addHandler(_file_handler)
+
+'''
+
+class ThreadLogFilter(logging.Filter):
+    """
+    This filter only show log entries for specified thread name
+    """
+
+    def __init__(self, thread_name, *args, **kwargs):
+        logging.Filter.__init__(self, *args, **kwargs)
+        self.thread_name = thread_name
+
+    def filter(self, record):
+        return record.threadName == self.thread_name
+
+
+
+def start_thread_logging():
+    """
+    Add a log handler to separate file for current thread
+    """
+    thread_name = threading.Thread.getName(threading.current_thread())
+    log_file = '/tmp/perThreadLogging-{}.log'.format(thread_name)
+    log_handler = logging.FileHandler(log_file)
+
+    log_handler.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter(
+        "%(asctime)-15s"
+        "| %(threadName)-11s"
+        "| %(levelname)-5s"
+        "| %(message)s")
+    log_handler.setFormatter(formatter)
+
+    log_filter = ThreadLogFilter(thread_name)
+    log_handler.addFilter(log_filter)
+
+    logger = logging.getLogger()
+    logger.addHandler(log_handler)
+
+    return log_handler
+
+
+def stop_thread_logging(log_handler):
+    # Remove thread log handler from root logger
+    logging.getLogger().removeHandler(log_handler)
+
+    # Close the thread log handler so that the lock on log file can be released
+    log_handler.close()
+
+'''

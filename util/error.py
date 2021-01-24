@@ -65,7 +65,7 @@ def error_handler_coerce(e, re_run):
 def error_handler_raise(e, re_run):
     raise e
 
-def get_error_handler(wait_time=0, re_run_times=0, exceptions_handled=None):
+def get_error_handler(wait_time=0, re_run_times=0, exceptions_handled=None, raise_if_same_errors: int = 1):
     '''
     Generate error_handle function for on_error decorator
 
@@ -89,16 +89,34 @@ def get_error_handler(wait_time=0, re_run_times=0, exceptions_handled=None):
     else:
         exceptions_tuple = (Exception,)
 
+    stop_counter = 1  # counter of same error happened in a row
+    last_exception_type = None
+
     def error_handler(e, re_run):
-        for i in range(re_run_times):
-            if wait_time > 0:
-                time.sleep(wait_time)
-            try:
-                ret = re_run()
-            except exceptions_tuple as e_re_run:
-                logging.exception(e_re_run)
-                logging.error(f'Fail to retry {i} times')
-                continue
-            return ret
-        raise e
+        # re-run handling
+        if re_run_times > 0:
+            logging.exception(e)  # TODO add re-run time to log
+            for i in range(re_run_times):
+                if wait_time > 0:
+                    time.sleep(wait_time)
+                try:
+                    ret = re_run()
+                except exceptions_tuple as e_re_run:
+                    logging.exception(e_re_run)
+                    logging.error(f'Fail to retry {i} times')
+                    continue
+                return ret
+
+        # raise only when same errors happened
+        nonlocal stop_counter
+        nonlocal last_exception_type
+        if type(e) == last_exception_type:
+            stop_counter += 1
+        if stop_counter >= raise_if_same_errors:
+            stop_counter = 1
+            last_exception_type = None
+            raise e
+        else:
+            logging.exception(e)  # TODO add reason to coerce the excpetion
+
     return error_handler

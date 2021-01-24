@@ -25,7 +25,7 @@ _engine = None
 _metadata = None
 _base = None
 
-def get_engine():
+def get_connection():
     global _engine
     if _engine is None:
         _connect_db()
@@ -81,8 +81,6 @@ def copy_to_db(conn, df: pd.DataFrame, table_name: str, from_file: bool = True):
     f = tempfile.TemporaryFile(mode='w+') if from_file else tempfile.SpooledTemporaryFile(mode='w+')  # SpooledTemporaryFile is in memory
     with f:
         df.to_csv(f, index=df.index.names[0] is not None, header=True)
-        f.seek(0)
-        print(f.read(500))
         f.seek(0)
         psycopg2_conn = conn.raw_connection()
         cursor = psycopg2_conn.cursor()

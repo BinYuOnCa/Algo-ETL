@@ -1,11 +1,13 @@
 import datetime
 import pandas as pd
+import time
 
 import finnhub
 from util.throttle import throttle
 import secrets
 
 finnhub_token = secrets.FINNHUB_TOKEN
+finnhub.Client.DEFAULT_TIMEOUT = 20
 
 # throttle finnhub request speed
 finnhub.Client._request = throttle(period=60, max_times=58,
@@ -34,10 +36,11 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
     if start_date is None:
         start_date = datetime.datetime(1970, 1, 1)
     if end_date is None:
-        end_date = datetime.datetime.today()
+        end_date = pd.Timestamp.now(time.tzname[0]).floor('D')
     start_timestamp = int(start_date.timestamp()) - int(start_date.timestamp()) % 86400
     end_timestamp = int(end_date.timestamp()) - int(end_date.timestamp()) % 86400
 
+    # get data from finnhub, put in df list
     stock_candle_df_list = []
     with finnhub.Client(api_key=finnhub_token) as fc:
         n = 5000
@@ -50,15 +53,16 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
                 start_timestamp = res['t'][-1] - (res['t'][-1] % 86400) + 86400
 
     if stock_candle_df_list:
+        # transform data
         df = pd.concat(stock_candle_df_list)
         df['t'] = pd.to_datetime(df['t'], unit='s')
-        df['t'] = df['t'].dt.floor('D')
+        df['t'] = df['t'].dt.tz_localize('UTC').dt.tz_convert('EST').dt.floor('D')
         df.sort_values(by='t', inplace=True)
         df['symbol'] = symbol
         df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
         df.drop_duplicates(['symbol', 't'], keep='last', inplace=True)
         df.set_index(['symbol', 't'], inplace=True)
-    else:
+    else: 
         df = pd.DataFrame({'c': [], 'h': [], 'l': [], 'o': [], 't': [], 'v': []})
     return df
 
@@ -72,7 +76,7 @@ def get_stock_1min_candles(symbol, start_time=None, end_time=None):
     if start_time is None:
         start_time = datetime.datetime(1970, 1, 1)
     if end_time is None:
-        end_time = datetime.datetime.now()
+        end_time = pd.Timestamp.now(time.tzname[0])
     start_timestamp = int(start_time.timestamp())
     end_timestamp = int(end_time.timestamp())
 
@@ -90,7 +94,7 @@ def get_stock_1min_candles(symbol, start_time=None, end_time=None):
     if stock_candle_df_list:
         df = pd.concat(stock_candle_df_list)
         df['t'] = pd.to_datetime(df['t'], unit='s')
-        df['t'] = df['t'].dt.floor('min')
+        df['t'] = df['t'].dt.tz_localize('UTC').dt.tz_convert('EST').dt.floor('min')
         df.sort_values(by='t', inplace=True)
         df['symbol'] = symbol
         df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
