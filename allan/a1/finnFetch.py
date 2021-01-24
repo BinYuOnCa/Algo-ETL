@@ -50,7 +50,7 @@ class FinnFetch:
     ##############################################################################
 
     # Fetch and load for each symbol
-    def fetchAndInsert_candle(self, params):
+    def fetchAndInsert_candle(self, params, table_name=None):
         data = self.finnClient.stock_candles(*params)
         
         # params is in shape of ('symbol', 'timeframe', 'start', 'end')
@@ -60,7 +60,7 @@ class FinnFetch:
             print_log(f">>>>> No Data >>>>>\n No data for params: {params}")
             return None
 
-        table_name = f"{params[0]}_candle_{params[1]}"
+        table_name = table_name or f"{params[0]}_candle_{params[1]}"
         if len(data['c']) > 1:
             return self.bulkInsert_candle(data, table_name)
         else:

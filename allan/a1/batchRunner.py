@@ -35,12 +35,19 @@ def args_verify_timespan(timespan):
     print("Error: timespan")
     return False
 
+def cleanup_table_name(table_name):
+    return table_name.replace('.', '_')
+
+
 def main(args):
     # Resolve arguments
     dry = args.dryrun
     verify = args.verify
     symbol = args.symbol
     timeframe = args.resolution
+
+    table_name = f"{symbol}_candle_{timeframe}"
+    table_name = cleanup_table_name(table_name)
 
     # Init client
     ff = FinnFetch()
@@ -55,7 +62,7 @@ def main(args):
         start = end - dt.timedelta(**timeback)
         # Check table for latest data point
         if verify:
-            tryGetLatest = ff.getLatestDataPoint(f"{symbol}_candle_{timeframe}")
+            tryGetLatest = ff.getLatestDataPoint(table_name)
             if tryGetLatest['success']:
                 # [(datetime.datetime(2021, 1, 22, 22, 11),)]
                 start = tryGetLatest['msg'][0][0]
@@ -66,7 +73,7 @@ def main(args):
     params = (symbol, timeframe, start, end)
 
     print_log("<<<<< BEGIN BATCH FETCH JOB <<<<<")
-    attemptInsert = ff.fetchAndInsert_candle(params)
+    attemptInsert = ff.fetchAndInsert_candle(params, table_name)
     if not attemptInsert['success']:
         msg = attemptInsert['msg']
         print(f"\n{msg}\n")

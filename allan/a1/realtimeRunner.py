@@ -21,7 +21,14 @@ def convert_realtimeSymbols(rts, timeframes):
 
     return toRun
 
+def cleanup_table_name(table_name):
+    return table_name.replace('.', '_')
+
+
 def main(timeframes):
+
+    table_name = f"{symbol}_candle_{timeframe}"
+    table_name = cleanup_table_name(table_name)
 
     rtSymbols = config.settings_json['realtimeSymbols']
 
@@ -38,7 +45,7 @@ def main(timeframes):
             startEnd = f_fun.getStartEnd(timeframe, dt.datetime(2021, 1, 11, 10, 1))
             params = (symbol, timeframe, startEnd['start'], startEnd['end'])
 
-            attemptInsert = ff.fetchAndInsert_candle(params)
+            attemptInsert = ff.fetchAndInsert_candle(params, table_name)
             try:
                 if not attemptInsert['success']:
                     msg = attemptInsert['msg']
