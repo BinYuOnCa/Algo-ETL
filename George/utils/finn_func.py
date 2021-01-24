@@ -49,7 +49,7 @@ def get_candles_df(ticker, candle_freq="D", start_timestamp=None,
                          "t": "finn_timestamp", "v": "volume"}, inplace=True)
         else:
             stock_candles = None
-        time.sleep(1.1)
+        time.sleep(2.1)
         return stock_candles
     except Exception as e:
         with open(Path(__file__).parent / "../logs/finn_log.log", "a") as f:
@@ -72,7 +72,7 @@ def get_split_df(ticker, start_date=None, to_date=None, api_key=api_key):
             to_date = datetime.today()
         r = requests.get(
             f'https://finnhub.io/api/v1/stock/split?symbol={ticker}&from={start_date}&to={to_date}&token={api_key}')
-        time.sleep(1.1)
+        time.sleep(2.1)
         if len(r.json()) != 0:
             return pd.DataFrame(r.json())# print(r.json())
         else:
