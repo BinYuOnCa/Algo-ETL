@@ -38,8 +38,12 @@ def args_verify_timespan(timespan):
 def main(args):
     # Resolve arguments
     dry = args.dryrun
+    verify = args.verify
     symbol = args.symbol
     timeframe = args.resolution
+
+    # Init client
+    ff = FinnFetch()
 
     timespan = args.timespan
     if timespan and args_verify_timespan(timespan):
@@ -49,11 +53,15 @@ def main(args):
         timeback = args_resolve_timeback(args.timeback)
         end = dt.datetime.today() 
         start = end - dt.timedelta(**timeback)
+        # Check table for latest data point
+        if verify:
+            tryGetLatest = ff.getLatestDataPoint(f"{symbol}_candle_{timeframe}")
+            if tryGetLatest['success']:
+                # [(datetime.datetime(2021, 1, 22, 22, 11),)]
+                start = tryGetLatest['msg'][0][0]
+                
         start = int(start.timestamp())
         end = int(end.timestamp())
-
-    # Init client
-    ff = FinnFetch()
 
     params = (symbol, timeframe, start, end)
 
@@ -77,5 +85,6 @@ if __name__ == '__main__':
     timeGroup.add_argument('--timespan', nargs=2, type=int, help='Specify start and end timestamp')
 
     parser.add_argument('-x', '--dryrun', action='store_true') # For testing purposes
+    parser.add_argument('-v', '--verify', action='store_true', help='Checks table and corrects start time to time of latest entry')
     args = parser.parse_args()
     main(args)

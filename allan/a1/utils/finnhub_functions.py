@@ -5,14 +5,6 @@ from datetime import timedelta
 from math import floor
 import requests
 
-def setupClient(sandbox=False):
-    FINNHUB_KEY = os.getenv("FINNHUB_KEY")
-    FINNHUB_KEY_SANDBOX = os.getenv("FINNHUB_KEY_SANDBOX")
-    fnc = finnhub.Client(
-      api_key = FINNHUB_KEY if not sandbox else FINNHUB_KEY_SANDBOX
-    )
-    return fnc
-
 # Gets start and end time for latest available timeframe given *timeframe* and time
 def getStartEnd(timeframe, time):
     def truncToHour(time):

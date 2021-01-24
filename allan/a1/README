@@ -23,7 +23,7 @@
 	large amounts of symbols
 
   NOTE: When calling batchRunner you can insert duplicate data into your tables.
-	No safeguard has been added (yet) to ensure no duplication
+	To avoid inserting duplicates, run batchRunner with the -v flag
 
   # Notifications:
 

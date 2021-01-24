@@ -4,20 +4,49 @@ import finnhub
 from psycopg2.errors import UndefinedTable
 from io import StringIO
 import pandas
+import os
 
 import config # Needed before other functions
-import utils.finnhub_functions as finn_fnc
-import utils.psql_functions as psql_fnc
 from utils.log_functions import print_log
+
+# Client Functions
+def setupClient():
+    FINNHUB_KEY = os.getenv("FINNHUB_KEY")
+    FINNHUB_KEY_SANDBOX = os.getenv("FINNHUB_KEY_SANDBOX")
+    fnc = finnhub.Client(
+      api_key = FINNHUB_KEY if not config.use_sandbox else FINNHUB_KEY_SANDBOX
+    )
+    return fnc
+
+def setupConn():
+    ENDPOINT = os.getenv("RDS_ENDPOINT")
+    PORT = os.getenv("RDS_ENDPOINT_PORT")
+    USR = os.getenv("RDS_USERNAME")
+    DBNAME = os.getenv("RDS_DBNAME" if not config.use_sandbox else "RDS_DBNAME_SANDBOX")
+    PASS = os.getenv("RDS_PASSWORD")
+
+    print_log(f"CONNECTING TO {DBNAME} as {USR}")
+    # Try to connect
+    try:
+        conn = psycopg2.connect(host=ENDPOINT, port=PORT, database=DBNAME, user=USR, password=PASS)
+    except Exception as e:
+        print_log("I am unable to connect to the database.")
+        print_log(f"Caught exception: {e}")
+
+        return None
+    
+    print_log("CONNECTION Established")
+    return conn
 
 class FinnFetch:
 
     def __init__(self):
-        self.finnClient = finn_fnc.setupClient(config.use_sandbox) 
-        self.conn = psql_fnc.setupConn(config.use_sandbox)
+        self.finnClient = setupClient() 
+        self.conn = setupConn()
+
         self.cur = self.conn.cursor()
 
-    #def check_tables(self, ):
+    ##############################################################################
 
     # Fetch and load for each symbol
     def fetchAndInsert_candle(self, params):
@@ -112,6 +141,17 @@ class FinnFetch:
 
         print_log(f"Created table (IF NOT EXISTS) {table_name}")
         return self.__psql_ret(True)
+    
+    def getLatestDataPoint(self, table_name):
+        statement = f"SELECT timestamp FROM {table_name} ORDER BY timestamp DESC LIMIT 1"
+        try:
+            self.cur.execute(statement)
+            ret = self.cur.fetchall()
+        except Exception as e:
+            print_log(f">>>>> DB_ERROR >>>>>\n{e}\n>>>>>>>>>>>>>>>>>>>>")
+            return self.__psql_ret(False, e)
+
+        return self.__psql_ret(True, ret)
 
     def commit(self):
         self.conn.commit()
