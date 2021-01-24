@@ -1,6 +1,7 @@
 import datetime as dt
 from datetime import datetime
 import finnhub
+import psycopg2
 from psycopg2.errors import UndefinedTable
 from io import StringIO
 import pandas
