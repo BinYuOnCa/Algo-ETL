@@ -15,7 +15,6 @@ def connect_to_db():
 
 def get_stock_list(conn):
     try:
-        # conn = connect_to_db()
         cur = conn.cursor()
         cur.execute("SELECT symbol FROM stock_list_test")
         records = cur.fetchall()
@@ -25,23 +24,7 @@ def get_stock_list(conn):
     except:
         print("No stock in the watch list. Please try again.")
 
-conn = connect_to_db()
-get_stock_list(conn)
-
-# conn = psycopg2.connect(
-#         database=DB_CONFIG["DATABASE"],
-#         user=DB_CONFIG["USER"],
-#         password=DB_CONFIG["PASSWORD"],
-#         host=DB_CONFIG["HOST"]
-# )
-# cur = conn.cursor()
-# cur.execute("SELECT symbol FROM stock_list_test")
-# records = cur.fetchall()
-# print(records)
-# cur.close()
-
 def load_into_1m_db(conn, stock, open_price, close_price, high_price, low_price, volumn, datetime):
-    # conn = connect_to_db()
     cur = conn.cursor()
     sql_query = \
         "INSERT INTO us_equity_1m_finn (symbol, open_price, close_price, high_price, low_price, volumn, datetime) values('"\
@@ -53,7 +36,6 @@ def load_into_1m_db(conn, stock, open_price, close_price, high_price, low_price,
     # print("Value inserted")
 
 def load_into_daily_db(conn, stock, open_price, close_price, high_price, low_price, volumn, datetime):
-    # conn = connect_to_db()
     cur = conn.cursor()
     sql_query = \
         "INSERT INTO us_equity_daily_finn (symbol, open_price, close_price, high_price, low_price, volumn, datetime) values('"\
