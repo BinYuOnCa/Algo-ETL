@@ -123,6 +123,7 @@ def stop_log():
     global _file_handler
     _logger.addHandler(_file_handler)
 
+
 '''
 
 class ThreadLogFilter(logging.Filter):
