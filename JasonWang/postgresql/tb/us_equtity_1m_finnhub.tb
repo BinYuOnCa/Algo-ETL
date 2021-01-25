@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS public.us_equity_1m_finnhub (
+    close_price     FLOAT NOT NULL,
+    high_price      FLOAT NOT NULL,
+    low_price       FLOAT NOT NULL,
+    open_price      FLOAT  NOT NULL,
+    return_status   VARCHAR(10) NOT NULL,
+    trade_time      TIMESTAMPTZ NOT NULL,
+    volume          int NOT NULL,
+    symbol          VARCHAR (10) NOT NULL,
+    trade_date_int  INT NOT NULL
+);
+
+ALTER TABLE public.us_equity_1m_finnhub
+ADD PRIMARY KEY (symbol, trade_date_int);
+
+grant select on table us_equity_1m_finnhub to algo;
