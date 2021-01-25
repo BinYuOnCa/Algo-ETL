@@ -15,3 +15,5 @@ secrets.py
 
 # Python related
 __pycache__/
+
+.gitignore
