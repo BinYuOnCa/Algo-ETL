@@ -8,6 +8,13 @@ import utils.param as param
 
 
 def archive_data(src: str, dst: str, pattern: str = '*'):
+    """
+    moving data file from one dir to another dir
+    :param src: (str)
+    :param dst: (str)
+    :param pattern: (str) optional
+    :return
+    """
     try:
         if not os.path.isdir(dst):
             pathlib.Path(dst).mkdir(parents=True, exist_ok=True)
@@ -19,6 +26,11 @@ def archive_data(src: str, dst: str, pattern: str = '*'):
 
 
 def cleanup_archive_data(dir_path: str):
+    """
+    clean up archive folder data
+    :param dir_path: (str)
+    :return
+    """
     try:
         # delete a given directory including its content
         shutil.rmtree(dir_path)
@@ -36,4 +48,3 @@ if __name__ == "__main__":
     """
     init_log()
     cleanup_archive_data(param.ARCHIVE_PATH)
-    # cleanup_archive_data(param.ARCHIVE_PATH)
