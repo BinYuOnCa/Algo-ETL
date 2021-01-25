@@ -1,0 +1,1 @@
+0 19 * * 1-5 bash /home/ubuntu/Algo-ETL/George/exec_main.sh > /home/ubuntu/log/crontab_log.log 2>&1
