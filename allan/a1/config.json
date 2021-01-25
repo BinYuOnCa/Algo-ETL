@@ -1,0 +1,40 @@
+{
+  "realtimeSymbols": [
+    {
+      "symbol": "FB",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "AMZN",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "NFLX",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "GOOG",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "MSFT",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "AAPL",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "AMD",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "NVDA",
+      "resolutions": [60, 30, 15, 5, 1]
+    },
+    {
+      "symbol": "GME",
+      "resolutions": [60, 30, 15, 5, 1]
+    }
+  ]
+}

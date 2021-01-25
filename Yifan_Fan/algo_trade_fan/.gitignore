@@ -1,0 +1,15 @@
+# Windows:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# User info:
+*.env
+sec_list_1000.csv
+test*.py
+tmp_dataframe.csv
+
+
+# System:
+*__pycache__/
+*.log
