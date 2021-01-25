@@ -4,7 +4,6 @@ from datetime import datetime
 from lib.messages import EmailNotification, SMSNotification
 from finnhub import FinnhubAPIException, FinnhubRequestException
 import sys
-# from decimal import Decimal
 import csv
 import pytz
 import sched
@@ -59,13 +58,15 @@ def load_and_etl(symbol, resolution, api):
         save_data = list(filter(lambda x: (x[tick_index] > latest_tick), candles_data))
         if(len(save_data) > 0):
             logging.debug("saving data for " + symbol)
-            SaveData().candles(symbol, save_data)
+            SaveData(resolution).candles(symbol, save_data)
         else:
             logging.debug("no new data")
     else:
+        print("yes")
         start_tick = str(int((datetime(2021, 1, 22) - datetime(1970, 1, 1)).total_seconds()))
         candles_data = getCurrentTick(symbol, resolution, start_tick)
-        SaveData().candles(symbol, candles_data)
+        print(candles_data)
+        SaveData(resolution).candles(symbol, candles_data)
 
 
 if __name__ == "__main__":
@@ -87,12 +88,12 @@ if __name__ == "__main__":
                 delay = delay + 1
     s.run()
 
-    # msg = 'Finished loading daily level stock candles.'
-    # if(resolution == '1'):
-    #     msg = 'Finished loading 1 minute level stock candles.'
-    # try:
-    #     EmailNotification().send('zhiwilliam@gmail.com', msg)
-    #     SMSNotification().send('+16475220400', msg)
-    # except Exception as error:
-    #     logging.error('Failed to send message out')
-    #     logging.error(error)
+    msg = 'Finished loading daily level stock candles.'
+    if(resolution == '1'):
+        msg = 'Finished loading 1 minute level stock candles.'
+    try:
+        EmailNotification().send('zhiwilliam@gmail.com', msg)
+        SMSNotification().send('+16475220400', msg)
+    except Exception as error:
+        logging.error('Failed to send message out')
+        logging.error(error)
