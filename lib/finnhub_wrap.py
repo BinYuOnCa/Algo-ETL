@@ -42,22 +42,24 @@ def get_stock_day_candles(symbol, start_date=None, end_date=None):
     end_timestamp = int(end_date.timestamp()) - int(end_date.timestamp()) % 86400
 
     # get data from finnhub, put in df list
+    new_start_ts = start_timestamp
     stock_candle_df_list = []
     with finnhub.Client(api_key=finnhub_token) as fc:
         n = 5000
-        while n >= 5000 and start_timestamp <= end_timestamp:
-            res = fc.stock_candles(symbol, 'D', start_timestamp, end_timestamp)
+        while n >= 5000 and new_start_ts <= end_timestamp:
+            res = fc.stock_candles(symbol, 'D', new_start_ts, end_timestamp)
             _check_stock_day_candle_data_format(res)
             n = len(res['t']) if res['s'] == 'ok' else 0
             if n > 0:
                 stock_candle_df_list.append(pd.DataFrame({'c': res['c'], 'h': res['h'], 'l': res['l'], 'o': res['o'], 't': res['t'], 'v': res['v']}))
-                start_timestamp = res['t'][-1] - (res['t'][-1] % 86400) + 86400
+                new_start_ts = res['t'][-1] - (res['t'][-1] % 86400) + 86400
 
     if stock_candle_df_list:
         # transform data
-        df = pd.concat(stock_candle_df_list)
+        df = pd.concat(stock_candle_df_list, ignore_index=True)
+        df['t'] = df['t'] - df['t'] % 86400
+        df = df[(df['t'] >= start_timestamp) & (df['t'] <= end_timestamp)]
         df['t'] = pd.to_datetime(df['t'], unit='s')
-        df['t'] = df['t'].dt.tz_localize('UTC').dt.tz_convert('EST').dt.floor('D')
         df.sort_values(by='t', inplace=True)
         df['symbol'] = symbol
         df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]
@@ -77,25 +79,28 @@ def get_stock_1min_candles(symbol, start_time=None, end_time=None):
     if start_time is None:
         start_time = datetime.datetime(1970, 1, 1)
     if end_time is None:
-        end_time = pd.Timestamp.now(time.tzname[0])
+        end_time = pd.Timestamp.now(time.tzname[0]).floor('min')
     start_timestamp = int(start_time.timestamp())
     end_timestamp = int(end_time.timestamp())
 
     stock_candle_df_list = []
+    new_end_ts = end_timestamp
     with finnhub.Client(api_key=finnhub_token) as fc:
         n = 5000
-        while n > 0 and start_timestamp <= end_timestamp:
-            res = fc.stock_candles(symbol, '1', start_timestamp, end_timestamp)
+        while n > 0 and start_timestamp <= new_end_ts:
+            res = fc.stock_candles(symbol, '1', start_timestamp, new_end_ts)
             _check_stock_1min_candle_data_format(res)
             n = len(res['t']) if res['s'] == 'ok' else 0
             if n > 0:
                 stock_candle_df_list.append(pd.DataFrame({'c': res['c'], 'h': res['h'], 'l': res['l'], 'o': res['o'], 't': res['t'], 'v': res['v']}))
-                end_timestamp = res['t'][0] - (res['t'][0] % 60) - 60
+                new_end_ts = res['t'][0] - (res['t'][0] % 60) - 60
 
     if stock_candle_df_list:
-        df = pd.concat(stock_candle_df_list)
+        df = pd.concat(stock_candle_df_list, ignore_index=True)
+        df['t'] = df['t'] - df['t'] % 60
+        df = df[(df['t'] >= start_timestamp) & (df['t'] <= end_timestamp)]
         df['t'] = pd.to_datetime(df['t'], unit='s')
-        df['t'] = df['t'].dt.tz_localize('UTC').dt.tz_convert('EST').dt.floor('min')
+        df['t'] = df['t'].dt.tz_localize('UTC').dt.tz_convert('EST')
         df.sort_values(by='t', inplace=True)
         df['symbol'] = symbol
         df = df[['symbol', 't', 'o', 'h', 'l', 'c', 'v']]

@@ -55,7 +55,8 @@ except Exception as e:
     n_total = len(symbols_df)
     stat_day = symbols_df['result_day'].value_counts()
     stat_min = symbols_df['result_min'].value_counts()
-    logging.critical(f"Full load failed! day({stat_day['error']}error, {stat_day['pending']}pending, {n_total}total), min({stat_min['error']}error, {stat_min['pending']}pending, {n_total}total)")
+    logging.critical(f"Full load failed! day({stat_day.get('error', 0)}error, {stat_day.get('pending', 0)}pending, {n_total}total), \
+                        min({stat_min.get('error', 0)}error, {stat_min.get('pending', 0)}pending, {n_total}total)")
     logging.exception(e)
     raise e
 else:

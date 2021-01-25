@@ -107,6 +107,7 @@ def get_error_handler(wait_time=0, re_run_times=0, exceptions_handled=None, rais
             last_exception_type = None
             raise e
         else:
+            last_exception_type = type(e)
             logging.exception(e)  # TODO add reason to coerce the excpetion
 
     return error_handler

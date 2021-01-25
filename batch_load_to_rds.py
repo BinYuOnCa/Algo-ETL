@@ -14,7 +14,7 @@ conn = lib.db_wrap.get_connection()
 
 # Get selected symbol list from csv file
 symbols_df = pd.read_csv(global_config['etl']['symbols_file'], header=None, names=['symbol'])
-symbols_df = symbols_df.sample(frac=1)
+symbols_df = symbols_df.sample(frac=1)  # reshuffle
 symbols_df['result_day'] = 'pending'
 symbols_df['result_day_err_msg'] = ''
 symbols_df['result_min'] = 'pending'
@@ -28,7 +28,7 @@ def apply_func_day_candle(row):
         lib.etl.load_day_candle(conn, row['symbol'])
     except Exception as e:
         row['result_day'] = 'error'
-        row['result_day_err_msg'] = f'error:{e}'
+        row['result_day_err_msg'] = str(e)
         raise e
     else:
         row['result_day'] = 'ok'
@@ -41,7 +41,7 @@ def apply_func_min_candle(row):
         lib.etl.load_1min_candle(conn, row['symbol'])
     except Exception as e:
         row['result_min'] = 'error'
-        row['result_min_err_msg'] = f'error:{e}'
+        row['result_min_err_msg'] = str(e)
         raise e
     else:
         row['result_min'] = 'ok'
@@ -54,7 +54,8 @@ except Exception as e:
     n_total = len(symbols_df)
     stat_day = symbols_df['result_day'].value_counts()
     stat_min = symbols_df['result_min'].value_counts()
-    logging.critical(f"Batch load failed! day({stat_day['error']}error, {stat_day['pending']}pending, {n_total}total), min({stat_min['error']}error, {stat_min['pending']}pending, {n_total}total)")
+    logging.critical(f"Batch load failed! day({stat_day.get('error', 0)}error, {stat_day.get('pending', 0)}pending, {n_total}total), \
+        min({stat_min.get('error', 0)}error, {stat_min.get('pending', 0)}pending, {n_total}total)")
     logging.exception(e)
     raise e
 else:
