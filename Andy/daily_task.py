@@ -11,7 +11,7 @@ notification('Intraday Candles ETL', 'Starts at {}'.format(datetime.now()))
 recent_dates_1m = get_rencent_dates('1m')
 e.ETL('1m', end_date=today, recent_dates=recent_dates_1m)
 
-if os.path.exists('failed_symbols_1m.csv'):
+if os.path.exists('doc/failed_symbols_1m.csv'):
     notification('Starts to perform ETL on failed symbols')
     e.ETL('1m', end_date=end, stary_date = recent_dates_1m,
           symbol_file='failed_1m.csv')

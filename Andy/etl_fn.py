@@ -78,7 +78,7 @@ def ETL(interval,
             clean_candles_df = pd.DataFrame()
     
     if failed_symbol:
-        with open(failed_csv[interval], 'w') as failed:
+        with open('doc/' + failed_csv[interval], 'w') as failed:
             failed.writelines(failed_symbol)
 
     # ETL End Time
