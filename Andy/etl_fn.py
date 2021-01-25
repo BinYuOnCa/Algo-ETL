@@ -1,10 +1,12 @@
 import pandas as pd
+import os
 from datetime import datetime
 from utils.extract import download_candle
 from utils.transform import candles_df_to_csv
 from utils.db import Database
 from utils.memory import memory_using
-from utils.config import cred_info, failed_csv, temp_csv, tab_names, msg_info, log
+from utils.config import (cred_info, failed_csv, temp_csv, tab_names, 
+                          msg_info, log, mem_lim)
 from utils.alert import notification
 from utils.time_processor import (export_recent_dates, get_rencent_dates,
                                   convert_from_sec, add_days)
@@ -27,8 +29,8 @@ def transfer(df, interval, conn_str):
 def ETL(interval,
         end_date,
         start_date=None,
-        symbol_file='./symbol.csv',
-        memory_limit=250,
+        symbol_file='doc/symbol.csv',
+        memory_limit=mem_lim,
         recent_dates=None,
         conn_str=cred_info['conn_str'],
         silence=False):
@@ -64,7 +66,6 @@ def ETL(interval,
                                              recent_dates=recent_dates)
             clean_candles_df = clean_candles_df.append(raw_candles_df,
                                                        ignore_index=True)
-
         except Exception as e:
             # 若发生下载问题，跳过此symbol，记载failed的symbol
             log.warning('Failed to download {} - {}'.format(symbol, e))
@@ -75,13 +76,12 @@ def ETL(interval,
             n_records += len(clean_candles_df)  # update the number of records
             transfer(clean_candles_df, interval, conn_str)
             clean_candles_df = pd.DataFrame()
-
+    
     if failed_symbol:
         with open(failed_csv[interval], 'w') as failed:
             failed.writelines(failed_symbol)
 
-
-# ETL End Time
+    # ETL End Time
     time1 = datetime.now()
 
     # Send Notification
@@ -91,12 +91,12 @@ def ETL(interval,
             time1.strftime('%Y-%m-%d %H:%M:%S'),
             convert_from_sec((time1 - time0).seconds), n_records)
         if failed_symbol:
-            with open(failed_csv[interval], 'r') as fail:
+            with open('doc/' + failed_csv[interval], 'r') as fail:
                 failed_sym = fail.readlines()
                 msg_sent += msg_info['fail'].format(len(failed_sym),
                                                     ''.join(failed_sym))
-
         notification(subject='ETL Completion', msg=msg_sent)
+
     # Export the updated dates
     export_recent_dates(interval, conn_str)
 
@@ -127,10 +127,10 @@ if __name__ == '__main__':
             )
             ''')
     # First daily ETL
-    #start = datetime(2001, 1, 25)
-    #end = datetime(2021, 1, 21)
-    #ETL('1d', end_date=end, start_date=start)
-    #First 1m ETL
-    #start = datetime(2020, 1, 25)
-    #end = datetime(2021, 1, 21)
-    #ETL('1m', end_date=end, start_date=start)
+    start = datetime(2001, 1, 25)
+    end = datetime(2021, 1, 22)
+    ETL('1d', end_date=end, start_date=start)
+    # First 1m ETL
+    start = datetime(2020, 1, 25)
+    end = datetime(2021, 1, 21)
+    ETL('1m', end_date=end, start_date=start)

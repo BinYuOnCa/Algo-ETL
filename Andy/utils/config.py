@@ -30,8 +30,8 @@ temp_csv = {'1m': './temp_1m.csv', '1d': './temp_daily.csv'}
 
 # csv file names to store the symbols failed to be downloaded
 failed_csv = {
-    '1m': './failed_symbols_1m.csv',
-    '1d': './failed_symbols_daily.csv'
+    '1m': 'failed_symbols_1m.csv',
+    '1d': 'failed_symbols_daily.csv'
 }
 
 # table names
@@ -64,3 +64,10 @@ msg_info = {
 # logging
 log.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                 filename='./log')
+
+# memory limit
+mem_lim = 250
+
+# unix time of 5 hrs
+unix_5h = 60 * 60 * 5
+

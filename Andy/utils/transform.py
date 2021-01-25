@@ -1,5 +1,5 @@
 from datetime import datetime
-from .config import column_names, temp_csv
+from .config import column_names, temp_csv, unix_5h
 
 
 def candles_df_to_csv(df, interval):
@@ -10,7 +10,7 @@ def candles_df_to_csv(df, interval):
         df['timestamp'] = df['t'].apply(
             lambda t: datetime.fromtimestamp(t).strftime('%H:%M:%S'))
 
-    lag = 0 if interval == '1m' else 5 * 60 * 60
+    lag = 0 if interval == '1m' else unit_5h
 
     df['t'] = df['t'].apply(
         lambda t: int(datetime.fromtimestamp(t + lag).strftime('%Y%m%d')))
@@ -28,5 +28,4 @@ def candles_df_to_csv(df, interval):
     # Reorder as RDS's structure
     new_index = column_names[interval]
     df = df[new_index]
-    print(df)
     df.to_csv(temp_csv[interval], index=False, header=False)

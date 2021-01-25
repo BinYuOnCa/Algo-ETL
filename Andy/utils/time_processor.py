@@ -63,7 +63,7 @@ def export_recent_dates(interval, conn_str, csv_file='recent_dates.csv'):
     '''.format(tab_names[interval])
     with Database(conn_str) as conn:
         df = pd.read_sql(sql, conn.connector)
-    df.to_csv(interval + '_' + csv_file, index=False)
+    df.to_csv('doc/' + interval + '_' + csv_file, index=False)
 
 
 def get_rencent_dates(interval):
@@ -72,6 +72,7 @@ def get_rencent_dates(interval):
     :param interval: 1m or 1d
     :return: (dict Str Int)
     '''
-    recent_dates = pd.read_csv(interval + '_recent_dates.csv')
+    recent_dates = pd.read_csv('doc/' + interval + '_recent_dates.csv')
     res_dict = recent_dates.set_index('symbol').T.to_dict('list')
     return res_dict
+
