@@ -160,7 +160,9 @@ def load_new_day_candle_from_finnhub(conn, symbol):
         return
 
     last_date_staging = last_day_candle_staging['t']
-    new_candles = finn.get_stock_day_candles(symbol, start_date=last_date_staging, end_date=pd.Timestamp.now(time.tzname[0]).floor('D'))
+    start_date = last_day_candle_staging['t'] + pd.Timedelta('1day')
+    end_date = pd.Timestamp.now(time.tzname[0]).floor('D')
+    new_candles = finn.get_stock_day_candles(symbol, start_date=start_date, end_date=end_date)
 
     # Check if there is a split, compared with last day
     # TODO check split
