@@ -10,8 +10,7 @@ class Settings():
         self.param_dic = {
             "host": "35.155.65.198",  # aws:35.155.65.198
             "database": "postgres",
-            "user": "postgres",
-            "password": "12345678"
+            "user": "postgres"
         }
 
         self.param_dic["password"] = os.environ.get('param_dic_password')
