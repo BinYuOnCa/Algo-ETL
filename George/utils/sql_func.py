@@ -22,9 +22,9 @@ def get_ticker_to_update_df(_conn=conn, col_name="ticker",
     return pd.read_sql(f"select {col_name} from {table_name} "
                        f"where create_date = (select max(create_date) from {table_name})", _conn)
 
-def get_last_timestamp(symbol, table_name, _conn=conn):
-    return pd.read_sql(f"select max(finn_timestamp) from {table_name} "
-                           f"where symbol = '" + str(symbol) + "'" , _conn).iloc[0, 0]
+def get_last_timestamp_df(table_name, _conn=conn):
+    return pd.read_sql(f"select symbol, max(finn_timestamp) as finn_timestamp from {table_name} "
+                           f"group by symbol" , _conn)
 
 def insert_df_to_db(df, table_name,sqlalchemy_engine=sqlalchemy_engine,
                     sqlserver_engine=conf.settings()["db_engine"]):
@@ -49,7 +49,7 @@ def insert_df_to_db_iter(df, table_name="split", _conn=conn):
             cursor.execute(
                 f"insert into {table_name} "
                 f"(ticker, split_date, from_factor, to_factor) values "
-                f"({row.symbol}, {row.date}, {row.fromFactor}, {row.toFactor})")
+                f"('{row.symbol}', '{parse(row.date).date()}', {row.fromFactor}, {row.toFactor})")
         _conn.commit()
     except Exception as e:
         with open(Path(__file__).parent / "../logs/finn_log.log", "a") as f:
@@ -59,7 +59,7 @@ def insert_df_to_db_iter(df, table_name="split", _conn=conn):
 def get_symbol_close_price(symbol, table_name, date=None, _conn=conn):
     if date is None:
         date = get_symbol_max_date(symbol, table_name)
-    close_price = pd.read_sql(f"select avg(close_price) as close_price from {table_name} "
+    close_price = pd.read_sql(f"select max(close_price) as close_price from {table_name} "
                        f"where symbol = '{symbol}' and date_int_key = '{date}'", _conn)
     return close_price if len(close_price) != 0 else None
 

@@ -19,35 +19,25 @@ class api_timer:
         """Start a new timer"""
         if self._start_time is not None:
             raise TimerError(f"Timer is running. Use .stop() to stop it")
-
         self._start_time = time.perf_counter()
 
     def stop(self):
         """Stop the timer"""
         if self._start_time is None:
             raise TimerError(f"Timer is not running. Use .start() to start it")
-
-        # elapsed_time = time.perf_counter() - self._start_time
         self._start_time = None
-        # print(f"Elapsed time: {elapsed_time:0.4f} seconds")
 
     def reset(self):
         """reset the timer"""
         if self._start_time is None:
             raise TimerError(f"Timer is not running. Use .start() to start it")
-
-        # elapsed_time = time.perf_counter() - self._start_time
         self._start_time = time.perf_counter()
-        # print(f"Elapsed time: {elapsed_time:0.4f} seconds")
 
     def elapsed(self):
         """report the elapsed time"""
         if self._start_time is None:
             raise TimerError(f"Timer is not running. Use .start() to start it")
-
         elapsed_time = time.perf_counter() - self._start_time
-
-        # print(f"Elapsed time: {elapsed_time:0.4f} seconds")
         return elapsed_time.__round__(2)
 
     def isstop(self):
@@ -68,11 +58,10 @@ class api_timer:
             self.start()
             pass
         self._elapsed_time = self.elapsed()
-        if self._call_counter >= self._limit:
-            if self._elapsed_time <= self._limit_time - 1:
+        if self._call_counter >= self._limit - 1:
+            if self._elapsed_time <= self._limit_time + 2:
                 # need sleep
-                # print("sleep " + str(self._limit_time - self._elapsed_time))
-                time.sleep(abs(self._limit_time - self._elapsed_time))
+                time.sleep(abs(self._limit_time - self._elapsed_time) + 2)
                 self._call_counter = 0
                 self._elapsed_time = 0
             else:
@@ -82,6 +71,7 @@ class api_timer:
                 else:
                     self.reset()
                 self._call_counter = 0
+                self._elapsed_time = 0
         else:
             if self._elapsed_time <= self._limit_time:
                 pass
@@ -91,4 +81,6 @@ class api_timer:
                     self.start()
                 else:
                     self.reset()
+                self._call_counter = 0
+                self._elapsed_time = 0
 

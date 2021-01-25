@@ -2,6 +2,7 @@ from datetime import datetime
 import pandas as pd
 from pathlib import Path
 import requests
+import time
 
 import finnhub
 
@@ -9,7 +10,6 @@ import config.config_parser as conf
 import utils.convert_time_timestamp as ctt
 
 api_key = conf.finnhub()["api_key"]
-# api_key = "sandbox_bv838gn48v6vtpa0emu0"
 # Setup client
 finnhub_client = finnhub.Client(api_key=api_key)
 
@@ -33,8 +33,8 @@ def get_candles_df(ticker, candle_freq="D", start_timestamp=None,
         if stop_timestamp is None:
             stop_timestamp = ctt.convert_datetime_timestamp(datetime.today())
         finnhub_candles = finnhub_client.stock_candles(ticker, candle_freq, start_timestamp, stop_timestamp)
-        stock_candles = pd.DataFrame(finnhub_candles)
-        if stock_candles["s"].iloc[0] == "ok":
+        if finnhub_candles["s"] == "ok":
+            stock_candles = pd.DataFrame(finnhub_candles)
             stock_candles["symbol"] = str(ticker)
             stock_candles["date_int_key"] = \
                 stock_candles["t"].apply(ctt.convert_timestamp_datetime).apply(datetime.date)
@@ -49,6 +49,7 @@ def get_candles_df(ticker, candle_freq="D", start_timestamp=None,
                          "t": "finn_timestamp", "v": "volume"}, inplace=True)
         else:
             stock_candles = None
+        time.sleep(2.1)
         return stock_candles
     except Exception as e:
         with open(Path(__file__).parent / "../logs/finn_log.log", "a") as f:
@@ -71,6 +72,7 @@ def get_split_df(ticker, start_date=None, to_date=None, api_key=api_key):
             to_date = datetime.today()
         r = requests.get(
             f'https://finnhub.io/api/v1/stock/split?symbol={ticker}&from={start_date}&to={to_date}&token={api_key}')
+        time.sleep(2.1)
         if len(r.json()) != 0:
             return pd.DataFrame(r.json())# print(r.json())
         else:
