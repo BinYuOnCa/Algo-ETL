@@ -38,7 +38,7 @@ def sqlalchemy_create_db_engine():
 
 #    url_eg = f'postgresql://user:{password}@{host}:{port}/{database}'
     url_eg = "postgresql://" + user + ":" + password + "@" + host + ":" + port + "/" + database
-    print(url_eg)
+#    print(url_eg)
 #     #    db_engine = create_engine('postgresql://scott:tiger@localhost/mydatabase')
 #     db_engine = create_engine(url_eg, pool_size=10, max_overflow=20)
     try:
