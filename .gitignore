@@ -1,0 +1,21 @@
+# vscode dir
+.vscode/
+
+# cornflake (flake8 extention of vscode) config file
+tox.ini
+
+# pycharm dir
+.idea/
+
+# Auth info
+secrets.py
+
+# Log files
+*.log
+
+# Python related
+__pycache__
+
+.gitignore
+
+*.env

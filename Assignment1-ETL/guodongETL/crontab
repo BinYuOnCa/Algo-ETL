@@ -1,0 +1,3 @@
+30 20 * * * sudo -i && cd /home/ubuntn/etl
+40 20 * * * conda activate etl
+30 21 * * * /root/anaconda3/envs/etl/bin/python3 /home/ubuntn/etl/etl.py

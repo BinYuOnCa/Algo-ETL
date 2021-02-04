@@ -1,0 +1,14 @@
+[FinnhubKey]
+APIKey=
+
+[PG_TABLE_NAME]
+DailyCandle=us_equity_daily_finn
+OneMinuteCandle=us_equity_1m_finn
+
+[Stock_NAME]
+Ticker[1]=AAPL
+Ticker[2]=TSLA
+Ticker[3]=SQ
+
+[DeafultStartTime]
+Startfrom=2020,1,1,0,0
