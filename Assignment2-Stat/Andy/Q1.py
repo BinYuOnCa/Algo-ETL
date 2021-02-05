@@ -11,8 +11,7 @@ candles_df.reset_index(inplace=True)
 avg_price = candles_df[['High', 'Low', 'Close']].mean(axis=1)
 cum_price_vol = (avg_price * candles_df['Volume']).cumsum()
 cum_vol = candles_df['Volume'].cumsum()
-candles_df['VWAP'] = (cum_price_vol / cum_vol).dropna()
-candles_df.dropna(inplace=True)  # Drop rows with NaN
+candles_df['VWAP'] = (cum_price_vol / cum_vol)
 
 #  Plot
 fig = go.Figure()
