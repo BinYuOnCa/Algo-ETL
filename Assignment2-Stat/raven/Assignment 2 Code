@@ -1,0 +1,183 @@
+import matplotlib.pyplot as plt
+from statsmodels.graphics.gofplots import qqplot
+from scipy.stats import shapiro
+import mplfinance as mpf
+import pandas as pd
+import numpy as np
+import datetime as dt
+from sklearn.decomposition import PCA
+from utils.config import *
+from utils.finnhub_util import *
+
+# Question 1:
+# Step 1: Loading data for BILI
+stock = "BILI"
+datetime_start = int(1611532800) # 2021/01/25
+datetime_end = int(1611619200) # 2021/01/26
+stock_candles = pd.DataFrame.from_records(download_1m_finn(stock, datetime_start, datetime_end))
+stock_candles['ts'] = [dt.datetime.fromtimestamp(x) for x in stock_candles['t']]
+print(stock_candles)
+stock_candles.to_csv('BILI_1m.csv')
+
+# Step 2: Plotting the data
+# Extracting data for plotting
+data = pd.read_csv('BILI_1m.csv')
+data['time'] = [dt.datetime.fromtimestamp(x).strftime("%H:%M:%S") for x in data['t']]
+mask = (data['time'] >= '09:30:00') & (data['time'] <= '16:00:00')
+data = data.loc[mask]
+data = data.loc[:, ['ts', 'o', 'h', 'l', 'c','v']]
+data['ts'] = [dt.datetime.strptime(x,'%Y-%m-%d %H:%M:%S') for x in data['ts']]
+print(data)
+data.set_index('ts', inplace=True)
+print(type(data.index))
+data.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+data.index.name = "Date"
+
+# Calculating VWAP
+data['VWAP'] = (data.Volume * (data.High + data.Low) / 2).cumsum() / data.Volume.cumsum()
+
+# Creating chart
+addplot = mpf.make_addplot(data['VWAP'])
+kwargs = dict(type='candle',volume=True)
+mpf.plot(data, **kwargs, style='yahoo', addplot=addplot, title='1M candlestick chart for BILI at 2021-01-25')
+
+# Question 2:
+# Step 1: Loading data for BILI
+stock = "BILI"
+datetime_start = int(1514764800) # 2018/01/01
+datetime_end = int(1609372800) # 2020/12/31
+stock_candles = pd.DataFrame.from_records(download_daily_finn(stock, datetime_start, datetime_end))
+stock_candles['ts'] = [dt.datetime.fromtimestamp(x) for x in stock_candles['t']]
+print(stock_candles)
+stock_candles.to_csv('BILI_daily.csv')
+
+# Step 2: Plotting the data
+# Extracting data for plotting
+data = pd.read_csv('BILI_daily.csv')
+data = data.loc[:, ['ts', 'o', 'h', 'l', 'c','v']]
+data['ts'] = [dt.datetime.strptime(x,'%Y-%m-%d %H:%M:%S') for x in data['ts']]
+print(data)
+data.set_index('ts', inplace=True)
+print(type(data.index))
+data.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+data.index.name = "Date"
+
+# Creating chart
+kwargs = dict(type='candle', mav=(30, 100), volume=True)
+mpf.plot(data, **kwargs, style='yahoo', title='Daily candlestick chart for BILI with EMAs')
+
+# Question 3
+# (1) Calculate daily return
+data = pd.read_csv('BILI_daily.csv')
+print(data)
+# data['c'].plot()
+# plt.xlabel("Date")
+# plt.ylabel("Price")
+# plt.show()
+
+# Adding daily return column
+data['daily_return'] = np.log(data['c']/data['c'].shift(1))
+# data.dropna(inplace=True)
+print(data.head())
+# data['daily_return'].plot()
+# plt.xlabel("Date")
+# plt.ylabel("Return")
+# plt.show()
+
+# (2) Hypothesis test
+# Histogram plot
+plt.hist(data['daily_return'])
+plt.show()
+
+# QQ Plot
+qqplot(data['daily_return'], line='s')
+plt.show()
+
+# Shapiro-Wilk test for normality since the sample size < 5000
+# H0: the daily return is normally distributed
+stat, p = shapiro(data['daily_return'])
+print('Statistics = %.3f, p = %.3f' % (stat, p))
+alpha = 0.5
+if p > alpha:
+    print('Daily return of BILI looks Gaussian distribution(fail to reject H0)')
+else:
+    print('Daily return of BILI not look Gaussian distribution(reject H0)')
+
+# Question 4
+# (1) Calculate daily return for each 10 stocks
+stocks = ['CRM', 'NFLX', 'AMD', 'HD', 'ABBV', 'CCL', 'T', 'DPZ', 'LB', 'XOM']
+index = 'SPY'
+datetime_start = int(1591056000) # 2020/06/02
+datetime_end = int(1609459200) # 2021/01/01
+daily_return = pd.DataFrame()
+# Stock returns
+for stock in stocks:
+    print(stock)
+    stock_candles = pd.DataFrame.from_records(download_daily_finn(stock, datetime_start, datetime_end))
+    stock_candles['ts'] = [dt.datetime.fromtimestamp(x) for x in stock_candles['t']]
+    stock_candles['daily_return'] = np.log(stock_candles['c']/stock_candles['c'].shift(1))
+    # print(stock_candles)
+    if stock == 'CRM':
+        # record = stock_candles[['ts', 'daily_return']]
+        daily_return = pd.DataFrame.from_records(stock_candles[['ts', 'daily_return']])
+        daily_return.rename(columns={'ts':'time', 'daily_return':'CRM'}, inplace=True)
+        # print(daily_return)
+    else:
+        daily_return[f"{stock}"] = stock_candles['daily_return']
+print(daily_return)
+# daily_return.to_csv('daily_return.csv')
+# Index return
+stock_candles = pd.DataFrame.from_records(download_daily_finn(index, datetime_start, datetime_end))
+stock_candles['ts'] = [dt.datetime.fromtimestamp(x) for x in stock_candles['t']]
+stock_candles['daily_return'] = np.log(stock_candles['c']/stock_candles['c'].shift(1))
+index_return = pd.DataFrame.from_records(stock_candles[['ts', 'daily_return']])
+index_return.rename(columns={'ts':'time', 'daily_return':'S&P500'}, inplace=True)
+print(index_return)
+# index_return.to_csv('index_return.csv')
+
+# (2) PCA
+# Clean out NaN
+# daily_return = pd.read_csv('daily_return.csv')
+daily_return = daily_return[~daily_return.iloc[:, 1:].isnull().all(1)]
+print(daily_return.head())
+# index_return = pd.read_csv('index_return.csv')
+index_return = index_return[~index_return.iloc[:, 1:].isnull().all(1)]
+
+print(index_return)
+
+pca = PCA()
+pca.fit(daily_return.iloc[:, 1:])
+print(pca.components_)
+print(pca.explained_variance_ratio_)
+
+# (3) Plot FPC vs S&P500
+fpc = pca.components_[0]
+print("First PC: ")
+print(fpc)
+fpc_weight = fpc / np.sum(np.absolute(fpc))
+print ("Weight % of FPC: ")
+print(fpc_weight)
+rel_return = (daily_return.iloc[:, 1:]).copy(deep=True)
+alloc = np.dot(rel_return, fpc_weight.T)
+# alloc = rel_return.cumprod().multiply(fpc_weight, axis=1).sum(axis=1)
+print(alloc)
+index = (index_return.iloc[:, 1:]).copy(deep=True)
+print(index)
+
+ax = plt.figure(figsize=(12,8)).gca()
+ax.plot(daily_return['time'], alloc, label='FPC', alpha=0.5)
+ax.plot(index_return['time'], index, label='Index', alpha=0.5)
+ax.grid()
+ax.set_xlabel('Date')
+ax.set_ylabel('Daily Return')
+ax.set_title('First Principal vs. S&P 500')
+plt.legend()
+plt.show()
+
+# (4) Correlation coefficient
+alloc = np.asarray(alloc)
+alloc = alloc.reshape((148,1))
+index = np.asarray(index)
+index = index.reshape((148,1))
+r = np.corrcoef(alloc, index)
+print(r)
