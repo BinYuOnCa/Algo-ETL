@@ -30,11 +30,9 @@ fig.add_trace(
                marker=dict(color='blue'),
                name='VWAP'))
 
-fig.update_layout(
-    title="THRM.V Intraday Candlestick & VWAP Plot on 2021/1/29",
-    xaxis_title="Time",
-    yaxis_title="Price",
-    legend_title='Plot Type',
-)
+fig.update_layout(title="THRM.V Intraday Candlestick & VWAP Plot on 2021/1/29",
+                  xaxis_title="Time",
+                  yaxis_title="Price",
+                  legend_title='Plot Type')
 
 fig.show()
