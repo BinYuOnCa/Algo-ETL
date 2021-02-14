@@ -1,9 +1,6 @@
 import pandas as pd
 import configparser
 import lib.Tools as tools
-import plotly.graph_objects as go
-import plotly.io as pio
-import os.path
 from os import path
 
 

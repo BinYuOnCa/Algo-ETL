@@ -48,7 +48,3 @@ def drawCandleStick_ByPlotly(df):
     fig.show()
 
 
-#
-def normfun(x, mu, sigma):
-    pdf = np.exp(-((x - mu) ** 2) / (2 * sigma ** 2)) / (sigma * np.sqrt(2 * np.pi))
-    return pdf
