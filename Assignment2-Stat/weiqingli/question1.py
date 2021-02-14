@@ -5,22 +5,20 @@ from os import path
 
 
 def get_Question1():
-
-    config = configparser.ConfigParser()
-    config.read('./lib/application.config')
-
-    key = config['finnhub']['key']
-    resolution = config['finnhub']['resolution']
-    symbol = config['finnhub']['symbol']
-    start_time = config['finnhub']['start_time']
-    end_time = config['finnhub']['end_time']
-
-    start = tools.date_to_epoch(start_time)
-    end = tools.date_to_epoch(end_time)
-
     if path.exists('./lib/AAPL_1Day_Candle.csv'):
         df = pd.read_csv('./lib/AAPL_1Day_Candle.csv')
     else:
+        config = configparser.ConfigParser()
+        config.read('./lib/application.config')
+
+        key = config['finnhub']['key']
+        resolution = config['finnhub']['resolution']
+        symbol = config['finnhub']['symbol']
+        start_time = config['finnhub']['start_time']
+        end_time = config['finnhub']['end_time']
+
+        start = tools.date_to_epoch(start_time)
+        end = tools.date_to_epoch(end_time)
         res = tools.getStockCandles(key, symbol, resolution, start, end)
         res.pop('s', None)
         df = pd.DataFrame(res)
