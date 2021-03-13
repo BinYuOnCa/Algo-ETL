@@ -62,6 +62,7 @@ def format_candle_df(df, symbol):
     if df[df['s'] != 'ok'].empty:
         df.drop('s', inplace=True, axis=1)
         df.columns = ['close', 'high', 'low', 'open', 'timestamp', 'volume']
+        df['volume'] = df['volume'].astype('int64')
         df['symbol'] = symbol
         datetime_series = pd.to_datetime(df['timestamp'], unit='s').dt.tz_localize('utc').dt.tz_convert('US/Eastern')
         df['date_key_int'] = datetime_series.dt.strftime('%Y%m%d')

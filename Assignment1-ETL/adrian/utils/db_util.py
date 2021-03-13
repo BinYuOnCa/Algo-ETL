@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import OperationalError
 import os
+from io import StringIO
 import sys
 import pandas as pd
 import pandas.io.sql as sqlio
@@ -31,6 +32,7 @@ def log_psycopg2_exception(err):
 def connect_to_db():
     conn = None
     for i in range(3):
+        print('Connecting to db...')
         try:
             conn = psycopg2.connect(database=db_config['database'],
                                     user=db_config['user'],
@@ -50,18 +52,18 @@ def connect_to_db():
 
 
 def copy_from_csv(conn, df, table, columns=None):
-    tmp_file = './tmp_df.csv'
-    df.to_csv(tmp_file, index=False, header=False)
+    tmp_stream = StringIO()
+    df.to_csv(tmp_stream, index=False, header=False)
+    tmp_stream.seek(0)
     cur = conn.cursor()
-    with open(tmp_file, 'r') as file:
-        try:
-            cur.copy_from(file, table, sep=',', columns=('close', 'high', 'low', 'open', 'timestamp', 'volume','symbol','date_key_int','time_key'))
-            conn.commit()
-        except OperationalError as e:
-            # passing exception to function
-            log_psycopg2_exception(e)
+    try:
+        cur.copy_from(tmp_stream, table, sep=',', columns=('close', 'high', 'low', 'open', 'timestamp', 'volume','symbol','date_key_int','time_key'))
+        conn.commit()
+    except OperationalError as e:
+        # passing exception to function
+        log_psycopg2_exception(e)
     cur.close()
-    os.remove(tmp_file)
+    tmp_stream.close()
 
 
 def get_last_ts(conn, table, symbol):
@@ -74,21 +76,16 @@ def get_last_ts(conn, table, symbol):
     cur =  conn.cursor()
     cur.execute(sql_query_last_date)
     last_ts_row = cur.fetchone()
-    if last_ts_row is None:
-        last_ts = 0
-    else:
-        # print(last_ts_row)
-        # print(type(last_ts_row))
+    last_ts = 0
+    if last_ts_row is not None:
         last_ts = last_ts_row[0]
     cur.close()
     return last_ts
 
 if __name__ == '__main__':
     conn = connect_to_db()
-    cur = conn.cursor()
-    last_ts = get_last_ts(cur, 'candle', 'ffff')
+    last_ts = get_last_ts(conn, 'us_stock_daily', 'TSLA')
     print('---------------')
     print(last_ts)
     print(type(last_ts))
-    cur.close()
     conn.close()
