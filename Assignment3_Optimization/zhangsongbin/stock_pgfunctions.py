@@ -4,10 +4,9 @@ import calendar
 import time
 from sqlalchemy import create_engine
 import pandas as pd
-from utils.stock_settings import Settings
-from utils import stock_csv_functions as csv
-from utils import stock_other_functions as oth
-from utils import stock_time as myt
+from  stock_settings import Settings
+import stock_other_functions as oth
+import stock_time as myt
 from io import StringIO
 
 output = StringIO()

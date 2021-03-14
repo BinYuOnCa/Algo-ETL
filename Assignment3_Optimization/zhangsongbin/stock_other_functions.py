@@ -7,7 +7,7 @@ import time
 import datetime
 import logging
 import traceback
-from utils.stock_settings import Settings
+from stock_settings import Settings
 import plotly.graph_objects as go
 
 
