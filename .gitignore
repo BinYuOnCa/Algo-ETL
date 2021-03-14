@@ -17,5 +17,6 @@ secrets.py
 __pycache__
 
 .gitignore
+.ipynb_checkpoints/
 
 *.env
