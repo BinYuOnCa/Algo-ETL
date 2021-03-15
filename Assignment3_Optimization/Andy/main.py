@@ -55,7 +55,7 @@ class GA():
                 person[:] = kid_selected
             opt_dna = pop[np.argmax(fit(pop, fn, self.domain))]
             arg = convert_binary(opt_dna, self.domain)
-            self.args.append(round(convert_binary(opt_dna, self.domain), dp))
+            self.args.append(round(arg, dp))
             self.opts.append(round(self.f(arg), dp))
         return {'arg': self.args[-1], 'optimum': self.opts[-1]}
 
