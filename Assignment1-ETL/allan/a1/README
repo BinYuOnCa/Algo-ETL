@@ -1,0 +1,78 @@
+# Notes on Project Structure:
+  Useable main scripts:
+	- realtimeRunner.py, used in conjunction with task scheduler (crontab)
+	- batchRunner.py, used to fetch historical data
+	- runAllConfigSymbolsBatch.py, used to run batchRunner for all symbols in config.json 
+
+  Config:
+	- .env should be filled with required vars before use
+	- config.py for some settings not fitting in .env 
+		- logs_folder: defaults to user home, can be modified
+	- config.json: Stores important data relating to which symbols to fetch (and
+	    which resolutions to fetch at)
+
+# Misc Notes
+  config.py should be import before other custom modules in main script(s)
+
+  finnHub has a maximum of 60 request / min, this needs to be taken into account when 
+  	trying to run multiple resolutions together realtime with large amounts of symbols
+
+	Ex. If only running with resolution of 1, up to 60 symbols can be fetched per minute
+
+    If only wanting to fetch historical data, simply using batchRunner should be no problem for
+	large amounts of symbols
+
+  NOTE: When calling batchRunner you can insert duplicate data into your tables.
+	To avoid inserting duplicates, run batchRunner with the -v flag
+
+  # Notifications:
+
+    SMS and Email notifications are set:
+      Email at the end of every day to notify completion, attached with logs of the day's work
+      SMS whenever there is an error for quick notification.
+
+    Changing email to run after job finished seems a bit much, but can easily add
+     crontab task to accomplish this
+
+# CRONTAB
+
+  "Main" files are meant to be run with crontab
+
+  crontab -e
+
+  Needs to be edited manually with above command, in accordance to each timeframe rule
+
+Example crontab used for assignment below:
+
+# 1 Minute Fetch
+* 9-23 * * MON          python3 $HOME/a1/realtimeRunner.py 1 >> $HOME/log/log_1
+* 9-23,0 * * TUE-FRI    python3 $HOME/a1/realtimeRunner.py 1 >> $HOME/log/log_1
+* 0 * * SAT             python3 $HOME/a1/realtimeRunner.py 1 >> $HOME/log/log_1
+0 1 * * TUE-SAT         python3 $HOME/a1/realtimeRunner.py 1 >> $HOME/log/log_1
+
+# 5 Minute Fetch
+*/5 9-23 * * MON        python3 $HOME/a1/realtimeRunner.py 5 >> $HOME/log/log_5
+*/5 9-23,0 * * TUE-FRI  python3 $HOME/a1/realtimeRunner.py 5 >> $HOME/log/log_5
+*/5 0 * * SAT           python3 $HOME/a1/realtimeRunner.py 5 >> $HOME/log/log_5
+0 1 * * TUE-SAT         python3 $HOME/a1/realtimeRunner.py 5 >> $HOME/log/log_5
+
+# 15 Minute Fetch
+*/15 9-23 * * MON       python3 $HOME/a1/realtimeRunner.py 15 >> $HOME/log/log_15
+*/15 9-23,0 * * TUE-FRI python3 $HOME/a1/realtimeRunner.py 15 >> $HOME/log/log_15
+*/15 0 * * SAT          python3 $HOME/a1/realtimeRunner.py 15 >> $HOME/log/log_15
+0 1 * * TUE-SAT         python3 $HOME/a1/realtimeRunner.py 15 >> $HOME/log/log_15
+
+# 30 Minute Fetch
+0,30 9-23 * * MON python3 $HOME/a1/realtimeRunner.py 30 >> $HOME/log/log_30
+0,30 9-23,0 * * TUE-FRI python3 $HOME/a1/realtimeRunner.py 30 >> $HOME/log/log_30
+0,30 0 * * SAT python3 $HOME/a1/realtimeRunner.py 30 >> $HOME/log/log_30
+0 1 * * TUE-SAT python3 $HOME/a1/realtimeRunner.py 30 >> $HOME/log/log_30
+
+# Hour Fetch
+0 9-23 * * MON          python3 $HOME/a1/realtimeRunner.py 60 >> $HOME/log/log_60
+0 9-23,0,1 * * TUE-FRI  python3 $HOME/a1/realtimeRunner.py 60 >> $HOME/log/log_60
+0 0,1 * * SAT           python3 $HOME/a1/realtimeRunner.py 60 >> $HOME/log/log_60
+
+# Email Notif
+1 1 * * TUE-SAT python3 $HOME/a1/email_job.py 1 5 15 30 60
+

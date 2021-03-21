@@ -1,0 +1,19 @@
+# static config file
+
+db:
+  host: 192.168.1.19
+  user: postgres
+  db_name: algo
+etl:
+  symbols_file: Harry_sec_list_1000.csv
+  stop_counter_if_same_errors: 10 
+log:
+  dir: log
+  default_log_file: main.log
+  log_leve: info  # TODO
+  tzname: EST
+twilio:
+  from: '+16182128108'
+  to: '+19052087755'
+
+

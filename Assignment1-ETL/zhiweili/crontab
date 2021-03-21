@@ -1,0 +1,2 @@
+3 23 * * * . $HOME/.my && cd /home/ubuntu/code/my/DS-Algo/CH2/zhiwilliam/HW3 && /home/ubuntu/anaconda3/bin/python loaddata.py -a api -r D
+30 23 * * * . $HOME/.my && cd /home/ubuntu/code/my/DS-Algo/CH2/zhiwilliam/HW3 && /home/ubuntu/anaconda3/bin/python loaddata.py -a rest -r 1
