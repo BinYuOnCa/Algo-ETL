@@ -1,0 +1,69 @@
+2021-02-07 18:40:15,452, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-07 18:40:15,452, root - ERROR - [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+2021-02-07 18:40:15,460, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_csv_functions.py", line 24, in clear_csv
+    a = open(path, mode='w')
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+
+2021-02-07 18:40:18,389, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-07 18:40:18,389, root - ERROR - [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+2021-02-07 18:40:18,392, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_csv_functions.py", line 70, in save_to_csv
+    candles.to_csv(path, index=False, header=False, mode="a")
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pandas\core\generic.py", line 3204, in to_csv
+    formatter.save()
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pandas\io\formats\csvs.py", line 184, in save
+    f, handles = get_handle(
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pandas\io\common.py", line 428, in get_handle
+    f = open(path_or_buf, mode, encoding=encoding, newline="")
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+
+2021-02-07 21:13:12,609, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-07 21:13:12,609, root - ERROR - invalid input syntax for type bigint: "42178.0"
+CONTEXT:  COPY stock_candles_day, line 1, column v: "42178.0"
+
+2021-02-07 21:13:12,609, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_pgfunctions.py", line 178, in pg_to_sql
+    cursor.copy_from(f, table, sep=",", columns=columns)
+psycopg2.errors.InvalidTextRepresentation: invalid input syntax for type bigint: "42178.0"
+CONTEXT:  COPY stock_candles_day, line 1, column v: "42178.0"
+
+
+2021-02-07 21:13:26,536, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-07 21:13:26,537, root - ERROR - invalid input syntax for type bigint: "133398.0"
+CONTEXT:  COPY stock_candles_day, line 1, column v: "133398.0"
+
+2021-02-07 21:13:26,537, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_pgfunctions.py", line 178, in pg_to_sql
+    cursor.copy_from(f, table, sep=",", columns=columns)
+psycopg2.errors.InvalidTextRepresentation: invalid input syntax for type bigint: "133398.0"
+CONTEXT:  COPY stock_candles_day, line 1, column v: "133398.0"
+
+
+2021-02-25 14:57:40,835, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-25 14:57:40,837, root - ERROR - [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+2021-02-25 14:57:40,838, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_csv_functions.py", line 24, in clear_csv
+    a = open(path, mode='w')
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+
+2021-02-25 14:57:42,966, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-25 14:57:42,966, root - ERROR - [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+2021-02-25 14:57:42,970, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_csv_functions.py", line 70, in save_to_csv
+    candles.to_csv(path, index=False, header=False, mode="a")
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pandas\core\generic.py", line 3204, in to_csv
+    formatter.save()
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pandas\io\formats\csvs.py", line 184, in save
+    f, handles = get_handle(
+  File "C:\ProgramData\Anaconda3\lib\site-packages\pandas\io\common.py", line 428, in get_handle
+    f = open(path_or_buf, mode, encoding=encoding, newline="")
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+
+2021-02-25 15:44:41,886, root - ERROR - !!!!!===================Your program has an error===============
+2021-02-25 15:44:41,887, root - ERROR - [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+2021-02-25 15:44:41,888, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_csv_functions.py", line 24, in clear_csv
+    a = open(path, mode='w')
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/stock_candles_day.csv'
+
