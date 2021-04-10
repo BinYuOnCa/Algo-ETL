@@ -396,6 +396,7 @@ class IBapi(EWrapper, EClient):
         new_sec_instance = sec_instance
         pd.set_option('display.max_columns', None)
         if new_sec_instance.buy_opportunity:
+            # print the dataframe for 1 mins bar, including vwap value
             print(f"new_sec_instance bar_1min : {new_sec_instance.bar_1min}")
         self.bar_set[self.nextValidOrderId] = new_sec_instance
         self.nextValidOrderId += 1

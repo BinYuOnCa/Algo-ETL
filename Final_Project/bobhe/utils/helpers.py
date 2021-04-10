@@ -73,8 +73,8 @@ def calculate_vwap(df):
     if not DATA_SUBSCRIPTION:
         df['average'] = (df.high + df.low + df.close) / 3
     df['vwap'] = (df.volume * df.average).cumsum() / df.volume.cumsum()
-    # pd.set_option('display.max_columns', None)
-    # print(df.tail())
+    if df['symbol'].iloc[-1] == 'AAPL' or 'JPM' or 'FB':
+        print(f"sec= {df['symbol'].iloc[-1]}, time={df['date'].iloc[-1]}, vwap = {df['vwap'].iloc[-1]}")
     return df
 
 
@@ -140,6 +140,7 @@ def exceed_15h():
         return True
     else:
         return False
+
 
 if __name__ == "__main__":
     market_opened(TIME_ZONE_ADJ,2)
