@@ -1,0 +1,28 @@
+2021-03-19 11:40:50,160, root - ERROR - !!!!!===================Your program has an error===============
+2021-03-19 11:40:50,160, root - ERROR - could not connect to server: Connection refused (0x0000274D/10061)
+	Is the server running on host "192.168.1.18" and accepting
+	TCP/IP connections on port 5432?
+
+2021-03-19 11:40:50,162, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_pgfunctions.py", line 38, in connect
+    conn = psycopg2.connect(**param_dic)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\psycopg2\__init__.py", line 127, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: could not connect to server: Connection refused (0x0000274D/10061)
+	Is the server running on host "192.168.1.18" and accepting
+	TCP/IP connections on port 5432?
+
+
+2021-04-02 21:25:12,397, root - ERROR - !!!!!===================Your program has an error===============
+2021-04-02 21:25:12,397, root - ERROR - column "result" does not exist
+LINE 1: insert into stock_algorithm values (result['best_one'], resu...
+                                            ^
+
+2021-04-02 21:25:12,398, root - ERROR - Traceback (most recent call last):
+  File "D:\Gitub\datascience\utils\stock_pgfunctions.py", line 57, in execute_sql
+    cursor.execute(sql)
+psycopg2.errors.UndefinedColumn: column "result" does not exist
+LINE 1: insert into stock_algorithm values (result['best_one'], resu...
+                                            ^
+
+
