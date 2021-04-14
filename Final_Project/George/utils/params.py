@@ -1,0 +1,64 @@
+DEBUG = True
+
+
+INVESTMENT_AMT = 5000
+
+TOTAL_BUY_POWER = 60000
+
+PRY_XCH = {
+    "SPCE": "NYSE",
+    "LX": "NASDAQ"
+}
+
+if DEBUG:
+    ACCOUNT = "DU3739057"  # paper trading
+    IBIP = '127.0.0.1'
+    PORT = 7497
+else:
+    ACCOUNT = ""  # prod trading
+    IBIP = '127.0.0.1'
+    PORT = 7496
+
+STP_BUY_HR = 15
+
+MAX_TRACING = 100
+
+MIN_PRICE = 2
+
+MAX_TRANS = 21
+
+MAX_ORDER_FREQ = 5
+MIN_ODR_CLR_SP = 3600
+
+MAX_STP = -0.001  # M52
+MIN_STP = -0.08  # M52
+
+MAX_PFT = 0.08  # M52
+MIN_PFT = 0.01  # M52
+
+VWAP_LEEWAY_COE = 0.002
+VWAP_LEEWAY_COE_RT = 0.003
+
+MIN_1MIN_QUALITY = 250
+
+SELL_VWAP_BLO = 0.01
+BUY_BLO = 0.00
+
+PATIENCE_LIMIT_BUY = 5  # for M55, in seconds. The time before cancelling an unsuitable order
+PATIENCE_LIMIT_SELL = 60
+
+SIMU_BUY_PERFECTION_ERROR = 0.0
+
+PROD_BUY_EARLIER_MIN = 0.01
+PROD_BUY_EARLIER_PERC = 0.001
+
+TIME_ZONE_ADJ = 0
+
+
+AVOID_STOCKS = ()
+
+BUYING_POWER_KEY = "BuyingPower"
+
+CURRENCY_CVT={"CAD":1.2573, "USD":1.0}
+
+MOVING_VWAP_WINDOW = 10
